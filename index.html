@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sis Barber Shop | Walsall</title>
+    <meta name="description" content="Great cuts, clean fades, and proper grooming — right in the heart of Walsall. Walk in or book online in 60 seconds.">
+
+    <link rel="icon" href="assets/images/logo.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <style>
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+            background-repeat: no-repeat;
+            background-position-x: 96%;
+            background-position-y: 50%;
+        }
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+        .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .brand-lockup {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+        .brand-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 999px;
+            object-fit: cover;
+            border: 1px solid #3f3f46;
+            background: #000;
+            box-shadow: 0 0 22px rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+        .brand-name {
+            font-size: 15px;
+            line-height: 0.95;
+            font-weight: 950;
+            letter-spacing: -0.03em;
+            text-transform: uppercase;
+            color: #fff;
+            white-space: nowrap;
+        }
+        .brand-kicker {
+            margin-top: 4px;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #71717a;
+        }
+        @media (max-width: 420px) {
+            .brand-logo { width: 50px; height: 50px; }
+            .brand-name { font-size: 13px; }
+            .brand-kicker { display: none; }
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           SOCIAL FEED — Official Embed Wrapper System
+           Strategy: load official TikTok + Instagram scripts, then
+           wrap each iframe in a dark shell that strips white chrome
+           and locks the grid column height to stay balanced.
+        ══════════════════════════════════════════════════════════ */
+
+        /* Column wrapper — fixed height keeps grid uniform */
+        .feed-col {
+            display: flex;
+            flex-direction: column;
+            background: #0a0a0a;
+            border: 1px solid #1c1c1e;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        .feed-col:hover {
+            border-color: #3f3f46;
+            box-shadow: 0 0 28px rgba(0,0,0,0.7);
+        }
+
+        /* Platform label bar at top of each card */
+        .feed-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-bottom: 1px solid #1c1c1e;
+            flex-shrink: 0;
+        }
+        .feed-label-icon { font-size: 13px; }
+        .feed-label-icon.tt { color: #a1a1aa; }
+        .feed-label-icon.ig { color: #c084fc; }
+        .feed-label-text {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #52525b;
+            flex: 1;
+        }
+        .feed-label-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse-dot 2.5s infinite;
+        }
+
+        /* The embed shell — position:relative is the containing block
+           for all absolute-positioned iframes inside it.
+           overflow:hidden clips the platform chrome (profile bar etc).
+           flex:1 + min-height:0 lets it expand to fill the card.    */
+        .embed-shell {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+            background: #000;
+            min-height: 0;
+        }
+
+        /* Loading shimmer shown until the iframe fires */
+        .embed-shimmer {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #0a0a0a;
+            z-index: 10;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        .embed-shimmer.fade { opacity: 0; }
+        .shimmer-icon { font-size: 28px; color: #27272a; }
+        .shimmer-bar {
+            width: 60px; height: 3px;
+            background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
+            background-size: 200% 100%;
+            animation: shimmer-move 1.4s infinite;
+            border-radius: 2px;
+        }
+        @keyframes shimmer-move {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* TikTok — blockquote wrapper stretches to fill shell */
+        .embed-shell blockquote.tiktok-embed {
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            background: transparent !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            height: 100% !important;   /* key: blockquote must be full height */
+            display: block !important;
+        }
+        /* TikTok SDK injects <iframe> into blockquote — fill it */
+        .embed-shell blockquote.tiktok-embed iframe {
+            position: absolute !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            border: none !important;
+            display: block !important;
+        }
+        /* Also catch any direct iframe the SDK may insert */
+        .embed-shell > iframe {
+            position: absolute !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            border: none !important;
+        }
+
+        /* Footer strip */
+        .feed-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 14px;
+            border-top: 1px solid #1c1c1e;
+            flex-shrink: 0;
+        }
+        .feed-caption {
+            font-size: 11px;
+            color: #52525b;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 10px;
+        }
+        .feed-ext-link {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #3f3f46;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .feed-ext-link:hover { color: #a1a1aa; }
+
+        /* Responsive grid — the key to balanced layout everywhere */
+        .feeds-grid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: 1fr;                    /* mobile: stacked */
+            grid-auto-rows: auto;
+        }
+        @media (min-width: 640px) {
+            .feeds-grid {
+                grid-template-columns: 1fr 1fr;            /* tablet: 2 col */
+            }
+        }
+        @media (min-width: 1280px) {
+            .feeds-grid {
+                grid-template-columns: repeat(4, 1fr);     /* desktop: 4 col */
+            }
+        }
+
+        /* Each feed column locks to a target height that works
+           across breakpoints — tall enough for the player, short
+           enough not to dominate on mobile                       */
+        .feed-col {
+            height: 600px;   /* default: phone/single col — generous */
+        }
+        @media (min-width: 640px) {
+            .feed-col { height: 580px; }  /* 2-col tablet */
+        }
+        @media (min-width: 1280px) {
+            .feed-col { height: 620px; }  /* 4-col desktop */
+        }
+        @media (min-width: 1536px) {
+            .feed-col { height: 680px; }  /* ultra-wide 2xl */
+        }
+
+        /* ── AI Chatbot ── */
+        #chat-bubble {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 999;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3B82F6, #A855F7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 24px rgba(168,85,247,0.5), 0 4px 16px rgba(0,0,0,0.5);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        #chat-bubble:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 36px rgba(168,85,247,0.7), 0 6px 20px rgba(0,0,0,0.6);
+        }
+        #chat-bubble .chat-icon { font-size: 22px; color: white; transition: all 0.2s; }
+        #chat-bubble .unread-dot {
+            position: absolute;
+            top: 4px; right: 4px;
+            width: 12px; height: 12px;
+            background: #22c55e;
+            border-radius: 50%;
+            border: 2px solid #000;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        #chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 28px;
+            width: 360px;
+            max-height: 540px;
+            z-index: 998;
+            display: flex;
+            flex-direction: column;
+            background: #0D0D0D;
+            border: 1px solid #27272a;
+            box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 30px rgba(168,85,247,0.1);
+            transform: translateY(20px) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+        #chat-window.open {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: all;
+        }
+        @media (max-width: 480px) {
+            #chat-window { width: calc(100vw - 24px); right: 12px; bottom: 90px; }
+        }
+        .chat-header {
+            background: linear-gradient(135deg, #3B82F6 0%, #A855F7 100%);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+        .chat-header-avatar {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .chat-header-info { flex: 1; }
+        .chat-header-info .name { font-size: 13px; font-weight: 800; color: white; letter-spacing: 0.05em; text-transform: uppercase; }
+        .chat-header-info .status { font-size: 10px; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 4px; margin-top: 1px; }
+        .chat-header-info .status::before { content:''; width:6px; height:6px; background:#22c55e; border-radius:50%; display:inline-block; }
+        .chat-close-btn { background: rgba(255,255,255,0.15); border: none; color: white; width:28px; height:28px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:12px; transition:background 0.2s; }
+        .chat-close-btn:hover { background: rgba(255,255,255,0.3); }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: #27272a transparent;
+        }
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+
+        .chat-msg { display: flex; flex-direction: column; max-width: 85%; }
+        .chat-msg.bot { align-self: flex-start; }
+        .chat-msg.user { align-self: flex-end; }
+        .chat-msg .bubble {
+            padding: 10px 14px;
+            font-size: 13px;
+            line-height: 1.55;
+            border-radius: 2px;
+        }
+        .chat-msg.bot .bubble {
+            background: #18181b;
+            color: #e4e4e7;
+            border: 1px solid #27272a;
+            border-radius: 0 8px 8px 8px;
+        }
+        .chat-msg.user .bubble {
+            background: linear-gradient(135deg, #3B82F6, #7C3AED);
+            color: white;
+            border-radius: 8px 0 8px 8px;
+        }
+        .chat-msg .ts { font-size: 9px; color: #52525b; margin-top: 3px; }
+        .chat-msg.bot .ts { text-align: left; }
+        .chat-msg.user .ts { text-align: right; }
+
+        .chat-quick-btns { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 10px; }
+        .quick-btn {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border: 1px solid #3f3f46;
+            background: transparent;
+            color: #a1a1aa;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .quick-btn:hover { border-color: #A855F7; color: white; background: rgba(168,85,247,0.1); }
+
+        .typing-indicator { display: flex; align-items: center; gap: 4px; padding: 10px 14px; }
+        .typing-indicator span { width:7px; height:7px; background:#3f3f46; border-radius:50%; animation: typing 1.2s infinite; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%,60%,100% { transform:translateY(0); opacity:0.4; } 30% { transform:translateY(-5px); opacity:1; } }
+
+        .chat-input-bar {
+            padding: 12px 16px;
+            border-top: 1px solid #27272a;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #0D0D0D;
+        }
+        .chat-input-bar input {
+            flex: 1;
+            background: #18181b;
+            border: 1px solid #27272a;
+            color: white;
+            font-size: 13px;
+            padding: 9px 14px;
+            border-radius: 2px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .chat-input-bar input::placeholder { color: #52525b; }
+        .chat-input-bar input:focus { border-color: #A855F7; }
+        .chat-send-btn {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, #3B82F6, #A855F7);
+            border: none;
+            border-radius: 2px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: opacity 0.2s;
+        }
+        .chat-send-btn:hover { opacity: 0.85; }
+
+        .wa-fallback-banner {
+            margin: 0 16px 12px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, rgba(37,211,102,0.1), rgba(37,211,102,0.05));
+            border: 1px solid rgba(37,211,102,0.25);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .wa-fallback-banner:hover { background: rgba(37,211,102,0.15); border-color: rgba(37,211,102,0.5); }
+        .wa-fallback-banner .wa-icon { color: #25D366; font-size: 18px; flex-shrink: 0; }
+        .wa-fallback-banner .wa-text { font-size: 11px; color: #a1a1aa; }
+        .wa-fallback-banner .wa-text strong { display: block; font-size: 12px; color: white; font-weight: 700; letter-spacing: 0.03em; margin-bottom: 1px; }
+
+        /* Gradient top line for chat */
+        .chat-gradient-top { height: 2px; background: linear-gradient(90deg, #3B82F6, #A855F7); }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white font-sans selection:bg-white selection:text-black min-h-screen flex flex-col justify-between scroll-smooth overflow-x-hidden">
+
+    <div class="w-full flex flex-col">
+        <!-- ═══════════════════════════════════════════════ HEADER ═══ -->
+        <header class="sticky top-0 z-50 bg-zinc-950/95 backdrop-blur-sm border-b border-zinc-900 px-4 lg:px-8 py-2 flex items-center justify-between">
+            <div class="brand-lockup group cursor-pointer" aria-label="Sis Barber Shop">
+                <img src="assets/images/logo.png" alt="Sis Barber Shop Logo" class="brand-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                <div>
+                    <div class="brand-name">Sis Barber Shop</div>
+                    <div class="brand-kicker">Walsall</div>
+                </div>
+                <div style="display:none;" class="items-center space-x-2">
+                    <i class="fa-solid fa-scissors text-white text-xl -rotate-45"></i>
+                    <span class="text-2xl font-black tracking-tighter uppercase text-white">SIS BARBER SHOP</span>
+                </div>
+            </div>
+
+            <nav class="hidden md:flex space-x-5 text-xs font-bold tracking-wider uppercase text-zinc-400">
+                <a href="#services" class="hover:text-white transition">Prices</a>
+                <a href="#team" class="hover:text-white transition">Team</a>
+                <a href="#booking" class="hover:text-white transition">Book</a>
+                <a href="#location" class="hover:text-white transition">Location</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <a href="#booking" class="hidden sm:inline-block bg-white text-black text-xs font-bold uppercase tracking-widest px-6 py-3 rounded-none hover:bg-transparent hover:text-white border-2 border-white transition duration-300">
+                    Book Now
+                </a>
+                <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none text-2xl p-1 hover:text-zinc-300 transition" aria-label="Toggle Menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ═══════════════════════════════════════════ MOBILE MENU ═══ -->
+        <div id="mobile-menu" class="fixed inset-0 z-[100] bg-zinc-950 flex flex-col justify-center items-center space-y-8 text-2xl font-black uppercase tracking-widest transition-transform duration-300 translate-x-full">
+            <button id="mobile-menu-close" class="absolute top-5 right-5 text-white text-4xl p-2 hover:text-zinc-400 transition focus:outline-none">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <i class="fa-solid fa-scissors text-zinc-900 text-[150px] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -z-10 -rotate-45 opacity-50"></i>
+            <a href="#services" class="mobile-link text-zinc-200 hover:text-white transition">Prices</a>
+            <a href="#team" class="mobile-link text-zinc-200 hover:text-white transition">Team</a>
+            <a href="#booking" class="mobile-link text-zinc-200 hover:text-white transition">Book</a>
+            <a href="#location" class="mobile-link text-zinc-200 hover:text-white transition">Location</a>
+            <a href="#booking" class="mobile-link bg-white text-black text-lg font-black px-12 py-5 tracking-widest border-2 border-white mt-8 hover:bg-zinc-200 transition">Book Now</a>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════  HERO ═══ -->
+        <section class="relative w-full grid grid-cols-1 lg:grid-cols-2 border-b border-zinc-900 bg-zinc-950 min-h-[calc(100vh-63px)]">
+            <div class="relative min-h-[45vh] lg:min-h-full bg-zinc-900 overflow-hidden flex flex-col justify-end p-6 sm:p-10 lg:p-12 border-b lg:border-b-0 lg:border-r border-zinc-900">
+                <img src="assets/images/shop_front.jpg" alt="Sis Barber Shop Walsall Storefront" class="absolute inset-0 w-full h-full object-cover filter brightness-75 contrast-110" onerror="this.src='https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1000&auto=format&fit=crop';">
+                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/95 via-zinc-950/40 to-transparent z-10"></div>
+                <div class="relative z-20 space-y-1 text-left">
+                    <p class="text-xs font-bold tracking-widest uppercase text-zinc-400">Unit 12, Shopping Centre, Walsall</p>
+                    <h2 class="text-2xl font-black uppercase tracking-tighter text-white max-w-md leading-none">Walsall cuts.<br>Clean finish.</h2>
+                </div>
+            </div>
+
+            <div class="flex flex-col justify-center px-6 sm:px-12 lg:px-16 xl:px-20 py-16 lg:py-24 bg-zinc-950">
+                <div class="max-w-xl w-full mx-auto lg:mx-0 flex flex-col justify-center text-left">
+                    <div class="space-y-6">
+                        <div>
+                            <div class="inline-flex items-center space-x-2.5 bg-emerald-950 border border-emerald-800 px-4 py-2 text-xs text-emerald-300 font-bold tracking-widest uppercase rounded-none">
+                                <i class="fa-solid fa-scissors text-emerald-500"></i>
+                                <span>Open 7 Days a Week</span>
+                            </div>
+                        </div>
+                        <div class="space-y-2.5">
+                            <h1 class="text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter uppercase leading-none">
+                                Sharp Cuts.<br><span class="text-zinc-500 font-extrabold">Clean Fades.</span>
+                            </h1>
+                            <p class="text-zinc-400 text-sm sm:text-base font-light tracking-wide leading-relaxed max-w-md">
+                                Fresh fades, beard trims, and full grooming. Walk in or book in 60 seconds.
+                            </p>
+                        </div>
+                        <div class="space-y-3.5 w-full max-w-md">
+                            <a href="#booking" class="block w-full bg-white text-black font-bold uppercase tracking-widest px-8 py-4 text-sm hover:bg-zinc-200 border-2 border-white transition duration-300 text-center">
+                                Book Your Chair
+                            </a>
+                            <a href="tel:07386032631" class="block w-full border-2 border-zinc-800 bg-zinc-900/30 text-white font-bold uppercase tracking-widest px-8 py-4 text-sm hover:bg-zinc-900 hover:border-zinc-700 transition duration-300 text-center flex items-center justify-center space-x-2.5">
+                                <i class="fa-solid fa-phone text-xs text-zinc-400"></i>
+                                <span>07386 032631</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════  SERVICES ═══ -->
+        <section id="services" class="py-16 px-6 max-w-6xl mx-auto w-full">
+            <div class="text-left space-y-2 mb-14 border-l-2 border-white pl-4">
+                <h2 class="text-3xl lg:text-4xl font-black uppercase tracking-tight">Menu</h2>
+                <p class="text-zinc-500 text-xs uppercase tracking-widest font-semibold">Clear prices. No extras.</p>
+            </div>
+
+            <!-- Haircuts -->
+            <div class="mb-10">
+                <p class="text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-4 pl-1">Haircuts</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Hair Cut</span>
+                        <span class="text-lg font-black text-white font-mono">£13</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Hair Cut (Skin Fade)</span>
+                        <span class="text-lg font-black text-white font-mono">£15</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Kid Hair Cut <span class="text-zinc-500 text-xs font-normal">Under 10</span></span>
+                        <span class="text-lg font-black text-white font-mono">£10</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Kids Skin Fade</span>
+                        <span class="text-lg font-black text-white font-mono">£12</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Skin Fade & Beard</span>
+                        <span class="text-lg font-black text-white font-mono">£20</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Services -->
+            <div class="mb-10">
+                <p class="text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-4 pl-1">Full Services</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300 md:col-span-2">
+                        <div>
+                            <span class="font-semibold text-sm text-white">Full Service</span>
+                            <span class="ml-3 text-[10px] uppercase tracking-wider text-zinc-500 bg-zinc-900 px-2 py-0.5">1.5 hrs</span>
+                        </div>
+                        <span class="text-lg font-black text-white font-mono">£36</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300 md:col-span-2">
+                        <div>
+                            <span class="font-semibold text-sm text-white">Hair Cut, Wash, Hot Towel Shave & Style</span>
+                            <span class="ml-3 text-[10px] uppercase tracking-wider text-zinc-500 bg-zinc-900 px-2 py-0.5">1 hr</span>
+                        </div>
+                        <span class="text-lg font-black text-white font-mono">£25</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Beard -->
+            <div class="mb-10">
+                <p class="text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-4 pl-1">Beard</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Beard Trim</span>
+                        <span class="text-lg font-black text-white font-mono">£10</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Beard Colour</span>
+                        <span class="text-lg font-black text-white font-mono">£10</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Beard Trim & Colour</span>
+                        <span class="text-lg font-black text-white font-mono">£17</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Beard & Hair Colour</span>
+                        <span class="text-lg font-black text-white font-mono">£30</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skin & Beauty -->
+            <div class="mb-10">
+                <p class="text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-4 pl-1">Skin & Beauty</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Exfoliate, Steam, Massage & Moisturise</span>
+                        <span class="text-lg font-black text-white font-mono">£25</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Full Head Colour</span>
+                        <span class="text-lg font-black text-white font-mono">£20</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Full Face Wax</span>
+                        <span class="text-lg font-black text-white font-mono">£10</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Ears Wax</span>
+                        <span class="text-lg font-black text-white font-mono">£4</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Nose Wax</span>
+                        <span class="text-lg font-black text-white font-mono">£4</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Face Cleaner Max</span>
+                        <span class="text-lg font-black text-white font-mono">£10</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Steam & Scrub</span>
+                        <span class="text-lg font-black text-white font-mono">£10</span>
+                    </div>
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Hair Remover (Thread)</span>
+                        <span class="text-lg font-black text-white font-mono">£5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hair Care -->
+            <div>
+                <p class="text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-4 pl-1">Hair Care</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="flex justify-between items-center p-5 border border-zinc-900 bg-zinc-950/60 hover:border-zinc-700 transition group duration-300">
+                        <span class="font-semibold text-sm text-white">Hair Wash & Hair Curl Cream</span>
+                        <span class="text-lg font-black text-white font-mono">£5</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════ ABOUT ═══ -->
+        <section id="about" class="py-16 px-6 border-t border-zinc-900 bg-zinc-950 relative overflow-hidden">
+            <div class="absolute inset-0 pointer-events-none">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[1px] bg-gradient-to-r from-transparent via-zinc-700 to-transparent"></div>
+            </div>
+            <div class="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
+
+                <div class="space-y-8">
+                    <div class="border-l-2 border-white pl-4 space-y-2">
+                        <h2 class="text-3xl lg:text-4xl font-black uppercase tracking-tight">The Shop</h2>
+                        <p class="text-zinc-500 text-xs uppercase tracking-widest font-semibold">Clean cuts. Good service.</p>
+                    </div>
+                    <p class="text-zinc-300 text-base leading-relaxed max-w-md">
+                        A sharp, welcoming barber shop in Walsall for fades, trims, beards, washes, and full grooming.
+                    </p>
+                    <div class="flex items-center gap-3 pt-2">
+                        <a href="#booking" class="bg-white text-black font-bold uppercase tracking-widest px-6 py-3 text-xs hover:bg-zinc-200 border-2 border-white transition duration-300">Book Now</a>
+                        <a href="tel:07386032631" class="border-2 border-zinc-800 text-white font-bold uppercase tracking-widest px-6 py-3 text-xs hover:border-zinc-600 transition duration-300">Call Us</a>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Washing Machine — Star Feature -->
+                    <div class="p-6 border border-zinc-700 bg-zinc-900/40 relative overflow-hidden group hover:border-white transition duration-300">
+                        <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-blue-500 to-purple-500"></div>
+                        <div class="flex items-start gap-5">
+                            <div class="w-14 h-14 flex items-center justify-center bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-zinc-700 flex-shrink-0 text-2xl">
+                                🫧
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-black text-sm uppercase tracking-wider text-white">Professional Hair Wash Suite</h3>
+                                    <span class="text-[9px] font-black uppercase tracking-widest bg-gradient-to-r from-blue-500 to-purple-500 text-white px-2 py-0.5">Premium</span>
+                                </div>
+                                <p class="text-zinc-300 text-sm leading-relaxed">A dedicated wash station for a cleaner, fresher finish before your cut.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-5 border border-zinc-900 bg-zinc-900/20 flex items-start gap-4 hover:border-zinc-700 transition duration-300">
+                        <div class="w-10 h-10 flex items-center justify-content bg-zinc-900 border border-zinc-800 flex-shrink-0 items-center justify-center text-lg">✂️</div>
+                        <div>
+                            <h3 class="font-bold text-sm uppercase tracking-wide text-white mb-1">Skilled Barbers</h3>
+                            <p class="text-zinc-400 text-xs leading-relaxed">Clean fades, sharp lines, consistent results.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-5 border border-zinc-900 bg-zinc-900/20 flex items-start gap-4 hover:border-zinc-700 transition duration-300">
+                        <div class="w-10 h-10 flex items-center bg-zinc-900 border border-zinc-800 flex-shrink-0 items-center justify-center text-lg">📍</div>
+                        <div>
+                            <h3 class="font-bold text-sm uppercase tracking-wide text-white mb-1">Easy to Find</h3>
+                            <p class="text-zinc-400 text-xs leading-relaxed">Shopping Centre, Walsall. Easy parking nearby.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═════════════════════════════════════════════════ TEAM ═══ -->
+        <section id="team" class="py-16 px-6 border-t border-zinc-900 bg-zinc-950 relative overflow-hidden">
+            <i class="fa-solid fa-scissors absolute right-[-5%] top-[20%] text-[400px] text-zinc-900/30 -z-10 -rotate-12 pointer-events-none"></i>
+
+            <div class="max-w-7xl mx-auto w-full text-center space-y-16 relative z-10">
+                <div class="flex flex-col items-center space-y-2">
+                    <h2 class="text-3xl lg:text-4xl font-black uppercase tracking-tight border-b-2 border-white pb-2 inline-flex items-center space-x-3">
+                        <i class="fa-solid fa-scissors text-zinc-600 text-xl"></i>
+                        <span>Meet The Team</span>
+                        <i class="fa-solid fa-scissors text-zinc-600 text-xl -scale-x-100"></i>
+                    </h2>
+                    <p class="text-zinc-500 text-xs uppercase tracking-widest font-semibold mt-4">Choose your barber when booking</p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-6">
+
+                    <!-- SISAY — cool calm lead barber, short fade, scissors -->
+                    <div class="space-y-4 group">
+                        <div class="relative w-24 h-24 mx-auto">
+                            <div class="w-full h-full rounded-full border-2 border-zinc-700 group-hover:border-blue-500 transition duration-300 overflow-hidden bg-zinc-900">
+                                <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                                    <!-- bg -->
+                                    <circle cx="48" cy="48" r="48" fill="#18181b"/>
+                                    <!-- body / shirt -->
+                                    <rect x="22" y="68" width="52" height="28" rx="8" fill="#3B82F6"/>
+                                    <!-- collar -->
+                                    <polygon points="48,72 40,68 56,68" fill="#1d4ed8"/>
+                                    <!-- neck -->
+                                    <rect x="42" y="60" width="12" height="12" rx="3" fill="#8B6914"/>
+                                    <!-- head -->
+                                    <ellipse cx="48" cy="48" rx="20" ry="22" fill="#A0722A"/>
+                                    <!-- hair — tight fade top -->
+                                    <path d="M28,42 Q30,24 48,22 Q66,24 68,42 Q62,28 48,27 Q34,28 28,42Z" fill="#1a1a1a"/>
+                                    <!-- ears -->
+                                    <ellipse cx="28" cy="50" rx="3.5" ry="4.5" fill="#8B6914"/>
+                                    <ellipse cx="68" cy="50" rx="3.5" ry="4.5" fill="#8B6914"/>
+                                    <!-- eyes -->
+                                    <ellipse cx="41" cy="48" rx="3.5" ry="4" fill="white"/>
+                                    <ellipse cx="55" cy="48" rx="3.5" ry="4" fill="white"/>
+                                    <circle cx="42" cy="49" r="2.2" fill="#1a1a1a"/>
+                                    <circle cx="56" cy="49" r="2.2" fill="#1a1a1a"/>
+                                    <circle cx="42.8" cy="48.2" r="0.8" fill="white"/>
+                                    <circle cx="56.8" cy="48.2" r="0.8" fill="white"/>
+                                    <!-- eyebrows -->
+                                    <path d="M38,44 Q41,42 44,43.5" stroke="#1a1a1a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                                    <path d="M52,43.5 Q55,42 58,44" stroke="#1a1a1a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                                    <!-- nose -->
+                                    <ellipse cx="48" cy="54" rx="2" ry="1.2" fill="#7a5510"/>
+                                    <!-- smile -->
+                                    <path d="M43,58 Q48,62 53,58" stroke="#7a5510" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                                    <!-- mini scissors badge -->
+                                    <circle cx="72" cy="24" r="9" fill="#3B82F6"/>
+                                    <text x="72" y="28" text-anchor="middle" font-size="10" fill="white">✂</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-black uppercase tracking-widest text-white">Sisay</h3>
+                            <p class="text-[9px] text-zinc-500 uppercase tracking-widest font-bold mb-2">Lead Barber</p>
+                            <p class="text-zinc-400 text-xs font-light leading-relaxed px-2">Skin fades and sharp line-ups.</p>
+                        </div>
+                    </div>
+
+                    <!-- ROBEL — beard specialist, full beard, warm tones -->
+                    <div class="space-y-4 group">
+                        <div class="relative w-24 h-24 mx-auto">
+                            <div class="w-full h-full rounded-full border-2 border-zinc-700 group-hover:border-purple-500 transition duration-300 overflow-hidden bg-zinc-900">
+                                <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                                    <circle cx="48" cy="48" r="48" fill="#18181b"/>
+                                    <!-- body -->
+                                    <rect x="22" y="68" width="52" height="28" rx="8" fill="#A855F7"/>
+                                    <polygon points="48,72 40,68 56,68" fill="#7e22ce"/>
+                                    <!-- neck -->
+                                    <rect x="42" y="60" width="12" height="12" rx="3" fill="#6B4F2A"/>
+                                    <!-- head -->
+                                    <ellipse cx="48" cy="47" rx="21" ry="23" fill="#7B5A2A"/>
+                                    <!-- hair — curly top -->
+                                    <path d="M27,44 Q26,22 48,20 Q70,22 69,44" fill="#0f0f0f"/>
+                                    <circle cx="34" cy="30" r="5" fill="#0f0f0f"/>
+                                    <circle cx="42" cy="25" r="5.5" fill="#0f0f0f"/>
+                                    <circle cx="51" cy="23" r="5" fill="#0f0f0f"/>
+                                    <circle cx="60" cy="26" r="5" fill="#0f0f0f"/>
+                                    <!-- ears -->
+                                    <ellipse cx="27" cy="49" rx="3.5" ry="4.5" fill="#7B5A2A"/>
+                                    <ellipse cx="69" cy="49" rx="3.5" ry="4.5" fill="#7B5A2A"/>
+                                    <!-- beard -->
+                                    <path d="M34,57 Q36,68 48,70 Q60,68 62,57 Q56,62 48,63 Q40,62 34,57Z" fill="#0f0f0f"/>
+                                    <!-- moustache -->
+                                    <path d="M42,55 Q48,58 54,55" stroke="#0f0f0f" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                                    <!-- eyes -->
+                                    <ellipse cx="41" cy="47" rx="3.5" ry="4" fill="white"/>
+                                    <ellipse cx="55" cy="47" rx="3.5" ry="4" fill="white"/>
+                                    <circle cx="42" cy="48" r="2.2" fill="#1a1a1a"/>
+                                    <circle cx="56" cy="48" r="2.2" fill="#1a1a1a"/>
+                                    <circle cx="42.8" cy="47.2" r="0.8" fill="white"/>
+                                    <circle cx="56.8" cy="47.2" r="0.8" fill="white"/>
+                                    <!-- eyebrows thick -->
+                                    <path d="M37.5,43 Q41,41 44,42.5" stroke="#0f0f0f" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                                    <path d="M52,42.5 Q55,41 58.5,43" stroke="#0f0f0f" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                                    <!-- nose -->
+                                    <ellipse cx="48" cy="53" rx="2.2" ry="1.3" fill="#5a3e1a"/>
+                                    <!-- badge -->
+                                    <circle cx="72" cy="24" r="9" fill="#A855F7"/>
+                                    <text x="72" y="28" text-anchor="middle" font-size="10" fill="white">✂</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-black uppercase tracking-widest text-white">Robel</h3>
+                            <p class="text-[9px] text-zinc-500 uppercase tracking-widest font-bold mb-2">Senior Stylist</p>
+                            <p class="text-zinc-400 text-xs font-light leading-relaxed px-2">Beards, shaves, and classic cuts.</p>
+                        </div>
+                    </div>
+
+                    <!-- NATHAN — young, trendy, spiky hair, streetwear -->
+                    <div class="space-y-4 group">
+                        <div class="relative w-24 h-24 mx-auto">
+                            <div class="w-full h-full rounded-full border-2 border-zinc-700 group-hover:border-emerald-500 transition duration-300 overflow-hidden bg-zinc-900">
+                                <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                                    <circle cx="48" cy="48" r="48" fill="#18181b"/>
+                                    <!-- body -->
+                                    <rect x="22" y="68" width="52" height="28" rx="8" fill="#10b981"/>
+                                    <polygon points="48,72 40,68 56,68" fill="#047857"/>
+                                    <!-- neck -->
+                                    <rect x="42" y="60" width="12" height="12" rx="3" fill="#C49A4A"/>
+                                    <!-- head -->
+                                    <ellipse cx="48" cy="48" rx="20" ry="22" fill="#D4A84B"/>
+                                    <!-- spiky hair -->
+                                    <polygon points="48,18 44,28 52,28" fill="#1a1a1a"/>
+                                    <polygon points="40,20 36,30 44,30" fill="#1a1a1a"/>
+                                    <polygon points="56,20 52,30 60,30" fill="#1a1a1a"/>
+                                    <polygon points="34,24 30,34 38,32" fill="#1a1a1a"/>
+                                    <polygon points="62,24 58,32 66,34" fill="#1a1a1a"/>
+                                    <path d="M28,44 Q30,28 48,26 Q66,28 68,44 Q64,32 48,31 Q32,32 28,44Z" fill="#1a1a1a"/>
+                                    <!-- ears -->
+                                    <ellipse cx="28" cy="50" rx="3.5" ry="4.5" fill="#D4A84B"/>
+                                    <ellipse cx="68" cy="50" rx="3.5" ry="4.5" fill="#D4A84B"/>
+                                    <!-- eyes — big anime style -->
+                                    <ellipse cx="41" cy="48" rx="4" ry="4.5" fill="white"/>
+                                    <ellipse cx="55" cy="48" rx="4" ry="4.5" fill="white"/>
+                                    <circle cx="42" cy="49" r="2.8" fill="#2d4a1e"/>
+                                    <circle cx="56" cy="49" r="2.8" fill="#2d4a1e"/>
+                                    <circle cx="43" cy="48" r="1" fill="white"/>
+                                    <circle cx="57" cy="48" r="1" fill="white"/>
+                                    <!-- eyebrows arched -->
+                                    <path d="M37,43.5 Q41,41 45,43" stroke="#1a1a1a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                                    <path d="M51,43 Q55,41 59,43.5" stroke="#1a1a1a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                                    <!-- nose -->
+                                    <circle cx="48" cy="54" r="1.3" fill="#b8912a"/>
+                                    <!-- grin -->
+                                    <path d="M42,58 Q48,63 54,58" stroke="#b8912a" stroke-width="1.5" fill="rgba(255,255,255,0.2)" stroke-linecap="round"/>
+                                    <!-- badge -->
+                                    <circle cx="72" cy="24" r="9" fill="#10b981"/>
+                                    <text x="72" y="28" text-anchor="middle" font-size="10" fill="white">✂</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-black uppercase tracking-widest text-white">Nathan</h3>
+                            <p class="text-[9px] text-zinc-500 uppercase tracking-widest font-bold mb-2">Texture Expert</p>
+                            <p class="text-zinc-400 text-xs font-light leading-relaxed px-2">Texture, crops, and modern styles.</p>
+                        </div>
+                    </div>
+
+                    <!-- YONAS — precise, glasses, detail-oriented look -->
+                    <div class="space-y-4 group">
+                        <div class="relative w-24 h-24 mx-auto">
+                            <div class="w-full h-full rounded-full border-2 border-zinc-700 group-hover:border-amber-500 transition duration-300 overflow-hidden bg-zinc-900">
+                                <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                                    <circle cx="48" cy="48" r="48" fill="#18181b"/>
+                                    <!-- body -->
+                                    <rect x="22" y="68" width="52" height="28" rx="8" fill="#f59e0b"/>
+                                    <polygon points="48,72 40,68 56,68" fill="#b45309"/>
+                                    <!-- neck -->
+                                    <rect x="42" y="60" width="12" height="12" rx="3" fill="#8B6914"/>
+                                    <!-- head -->
+                                    <ellipse cx="48" cy="48" rx="20" ry="22" fill="#9B7320"/>
+                                    <!-- hair — low cut, clean -->
+                                    <path d="M28,44 Q28,24 48,22 Q68,24 68,44 Q64,30 48,29 Q32,30 28,44Z" fill="#0d0d0d"/>
+                                    <!-- ears -->
+                                    <ellipse cx="28" cy="50" rx="3.5" ry="4.5" fill="#9B7320"/>
+                                    <ellipse cx="68" cy="50" rx="3.5" ry="4.5" fill="#9B7320"/>
+                                    <!-- glasses frames -->
+                                    <rect x="35" y="44" width="10" height="8" rx="3" fill="none" stroke="#f59e0b" stroke-width="1.8"/>
+                                    <rect x="51" y="44" width="10" height="8" rx="3" fill="none" stroke="#f59e0b" stroke-width="1.8"/>
+                                    <line x1="45" y1="48" x2="51" y2="48" stroke="#f59e0b" stroke-width="1.5"/>
+                                    <line x1="35" y1="48" x2="31" y2="47" stroke="#f59e0b" stroke-width="1.5"/>
+                                    <line x1="61" y1="48" x2="65" y2="47" stroke="#f59e0b" stroke-width="1.5"/>
+                                    <!-- eyes behind glasses -->
+                                    <circle cx="40" cy="48" r="1.8" fill="#1a1a1a"/>
+                                    <circle cx="56" cy="48" r="1.8" fill="#1a1a1a"/>
+                                    <circle cx="40.6" cy="47.4" r="0.7" fill="white"/>
+                                    <circle cx="56.6" cy="47.4" r="0.7" fill="white"/>
+                                    <!-- eyebrows -->
+                                    <path d="M36,43 Q40,41.5 44,42.5" stroke="#0d0d0d" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                                    <path d="M52,42.5 Q56,41.5 60,43" stroke="#0d0d0d" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                                    <!-- nose -->
+                                    <ellipse cx="48" cy="54" rx="1.8" ry="1.1" fill="#7a5510"/>
+                                    <!-- neutral focused expression -->
+                                    <path d="M44,58.5 Q48,60 52,58.5" stroke="#7a5510" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+                                    <!-- badge -->
+                                    <circle cx="72" cy="24" r="9" fill="#f59e0b"/>
+                                    <text x="72" y="28" text-anchor="middle" font-size="10" fill="white">✂</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-black uppercase tracking-widest text-white">Yonas</h3>
+                            <p class="text-[9px] text-zinc-500 uppercase tracking-widest font-bold mb-2">Detail Specialist</p>
+                            <p class="text-zinc-400 text-xs font-light leading-relaxed px-2">Tapers, blends, and fine detail.</p>
+                        </div>
+                    </div>
+
+                    <!-- DAVE — fade technician, cap backwards, confident -->
+                    <div class="space-y-4 group">
+                        <div class="relative w-24 h-24 mx-auto">
+                            <div class="w-full h-full rounded-full border-2 border-zinc-700 group-hover:border-rose-500 transition duration-300 overflow-hidden bg-zinc-900">
+                                <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                                    <circle cx="48" cy="48" r="48" fill="#18181b"/>
+                                    <!-- body -->
+                                    <rect x="22" y="68" width="52" height="28" rx="8" fill="#ef4444"/>
+                                    <polygon points="48,72 40,68 56,68" fill="#b91c1c"/>
+                                    <!-- neck -->
+                                    <rect x="42" y="60" width="12" height="12" rx="3" fill="#C49A4A"/>
+                                    <!-- head -->
+                                    <ellipse cx="48" cy="49" rx="20" ry="21" fill="#D4A84B"/>
+                                    <!-- backwards cap -->
+                                    <ellipse cx="48" cy="33" rx="22" ry="7" fill="#1a1a1a"/>
+                                    <rect x="26" y="28" width="44" height="9" rx="4" fill="#1a1a1a"/>
+                                    <!-- cap brim at back -->
+                                    <ellipse cx="48" cy="28" rx="14" ry="4" fill="#0d0d0d"/>
+                                    <!-- ears -->
+                                    <ellipse cx="28" cy="51" rx="3.5" ry="4.5" fill="#D4A84B"/>
+                                    <ellipse cx="68" cy="51" rx="3.5" ry="4.5" fill="#D4A84B"/>
+                                    <!-- eyes -->
+                                    <ellipse cx="41" cy="49" rx="3.5" ry="4" fill="white"/>
+                                    <ellipse cx="55" cy="49" rx="3.5" ry="4" fill="white"/>
+                                    <circle cx="42" cy="50" r="2.2" fill="#1a1a1a"/>
+                                    <circle cx="56" cy="50" r="2.2" fill="#1a1a1a"/>
+                                    <circle cx="42.8" cy="49.2" r="0.8" fill="white"/>
+                                    <circle cx="56.8" cy="49.2" r="0.8" fill="white"/>
+                                    <!-- eyebrows confident -->
+                                    <path d="M38,44.5 Q41,43 44,44" stroke="#1a1a1a" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                    <path d="M52,44 Q55,43 58,44.5" stroke="#1a1a1a" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                    <!-- nose -->
+                                    <ellipse cx="48" cy="55" rx="2" ry="1.2" fill="#b8912a"/>
+                                    <!-- big grin showing teeth -->
+                                    <path d="M41,59 Q48,65 55,59" stroke="#b8912a" stroke-width="1.5" fill="rgba(255,255,255,0.85)" stroke-linecap="round"/>
+                                    <!-- badge -->
+                                    <circle cx="72" cy="24" r="9" fill="#ef4444"/>
+                                    <text x="72" y="28" text-anchor="middle" font-size="10" fill="white">✂</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-black uppercase tracking-widest text-white">Dave</h3>
+                            <p class="text-[9px] text-zinc-500 uppercase tracking-widest font-bold mb-2">Fade Technician</p>
+                            <p class="text-zinc-400 text-xs font-light leading-relaxed px-2">Fast fades and crisp finishes.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════  GALLERY / FEEDS ═══ -->
+        <section id="gallery" class="py-16 px-6 border-t border-zinc-900 bg-zinc-950">
+            <div class="max-w-7xl mx-auto w-full">
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-16 border-l-2 border-white pl-4">
+                    <div class="space-y-2">
+                        <h2 class="text-3xl lg:text-4xl font-black uppercase tracking-tight">Fresh Cuts</h2>
+                        <p class="text-zinc-500 text-xs uppercase tracking-widest font-semibold">@sisaygrmay123</p>
+                    </div>
+                    <div class="flex items-center gap-3 pl-4 sm:pl-0">
+                        <a href="https://www.tiktok.com/@sisaygrmay123" target="_blank" rel="noopener" class="flex items-center gap-2 border border-zinc-800 bg-zinc-900/30 hover:border-zinc-600 hover:bg-zinc-900 transition px-4 py-2 text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-white">
+                            <i class="fa-brands fa-tiktok"></i> Follow on TikTok
+                        </a>
+                    </div>
+                </div>
+
+                <div class="feeds-grid" style="grid-template-columns:1fr; max-width:520px; margin:0 auto;">
+
+                    <!-- ══ TikTok — Video 1 ══ -->
+                    <div class="feed-col">
+                        <div class="feed-label">
+                            <i class="fa-brands fa-tiktok feed-label-icon tt"></i>
+                            <span class="feed-label-text">TikTok</span>
+                            <span class="feed-label-dot"></span>
+                        </div>
+                        <div class="embed-shell" id="tt-shell-1">
+                            <div class="embed-shimmer" id="tt-shim-1">
+                                <i class="fa-brands fa-tiktok shimmer-icon"></i>
+                                <div class="shimmer-bar"></div>
+                            </div>
+                            <blockquote class="tiktok-embed"
+                                cite="https://www.tiktok.com/@sisaygrmay123/video/7575872356543925526"
+                                data-video-id="7575872356543925526"
+                                data-embed-from="oembed">
+                                <section></section>
+                            </blockquote>
+                        </div>
+                        <div class="feed-footer">
+                            <span class="feed-caption">Fresh fade ✂️ precision cut</span>
+                            <a class="feed-ext-link" href="https://www.tiktok.com/@sisaygrmay123/video/7575872356543925526" target="_blank" rel="noopener">
+                                View <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:8px;"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ══ TikTok — Video 2 ══ -->
+                    <div class="feed-col">
+                        <div class="feed-label">
+                            <i class="fa-brands fa-tiktok feed-label-icon tt"></i>
+                            <span class="feed-label-text">TikTok</span>
+                            <span class="feed-label-dot"></span>
+                        </div>
+                        <div class="embed-shell" id="tt-shell-2">
+                            <div class="embed-shimmer" id="tt-shim-2">
+                                <i class="fa-brands fa-tiktok shimmer-icon"></i>
+                                <div class="shimmer-bar"></div>
+                            </div>
+                            <blockquote class="tiktok-embed"
+                                cite="https://www.tiktok.com/@sisaygrmay123/video/7584637394528357654"
+                                data-video-id="7584637394528357654"
+                                data-embed-from="oembed">
+                                <section></section>
+                            </blockquote>
+                        </div>
+                        <div class="feed-footer">
+                            <span class="feed-caption">Skin fade transition 🔥</span>
+                            <a class="feed-ext-link" href="https://www.tiktok.com/@sisaygrmay123/video/7584637394528357654" target="_blank" rel="noopener">
+                                View <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:8px;"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════  BOOKING ═══ -->
+        <section id="booking" class="py-16 px-6 border-t border-zinc-900 bg-zinc-950 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-white/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center relative z-10">
+                <div class="space-y-8 text-left">
+                    <div class="space-y-2 border-l-2 border-white pl-4">
+                        <h2 class="text-3xl lg:text-4xl font-black uppercase tracking-tight">Book Your Chair</h2>
+                        <p class="text-zinc-500 text-xs uppercase tracking-widest font-semibold">Done in 60 seconds</p>
+                    </div>
+                    <p class="text-zinc-400 text-sm font-light leading-relaxed max-w-md">
+                        Choose your service, barber, date, and time. Confirmation opens in WhatsApp.
+                    </p>
+                </div>
+
+                <div class="bg-zinc-950 border border-zinc-800 p-6 sm:p-10 relative shadow-[0_0_40px_rgba(255,255,255,0.03)]">
+                    <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-zinc-800 via-zinc-400 to-zinc-800"></div>
+
+                    <form id="appointment-form" class="space-y-8">
+                        <div class="space-y-3">
+                            <label class="text-[11px] uppercase font-bold tracking-widest text-zinc-400 flex items-center"><i class="fa-solid fa-scissors w-5 text-zinc-600"></i> Service</label>
+                            <select id="form-service" onchange="updateTimeSlots()" class="w-full bg-zinc-900/50 border border-zinc-800 text-white text-sm p-4 focus:border-zinc-500 focus:outline-none transition font-medium tracking-wide">
+                                <option value="" disabled selected>Choose a service</option>
+                                <optgroup label="✂️ Haircuts">
+                                    <option value="Hair Cut" data-duration="30">Hair Cut — £13</option>
+                                    <option value="Hair Cut (Skin Fade)" data-duration="30">Hair Cut (Skin Fade) — £15</option>
+                                    <option value="Kid Hair Cut" data-duration="30">Kid Hair Cut (Under 10) — £10</option>
+                                    <option value="Kids Skin Fade" data-duration="30">Kids Skin Fade — £12</option>
+                                    <option value="Skin Fade & Beard" data-duration="45">Skin Fade &amp; Beard — £20</option>
+                                </optgroup>
+                                <optgroup label="👑 Full Services">
+                                    <option value="Full Service" data-duration="90">Full Service (1 hr 30 min) — £36</option>
+                                    <option value="Hair Cut, Wash, Hot Towel Shave & Style" data-duration="60">Hair Cut, Wash, Hot Towel Shave &amp; Style (1 hr) — £25</option>
+                                </optgroup>
+                                <optgroup label="🧔 Beard">
+                                    <option value="Beard Trim" data-duration="20">Beard Trim — £10</option>
+                                    <option value="Beard Colour" data-duration="30">Beard Colour — £10</option>
+                                    <option value="Beard Trim & Colour" data-duration="40">Beard Trim &amp; Colour — £17</option>
+                                    <option value="Beard & Hair Colour" data-duration="45">Beard &amp; Hair Colour — £30</option>
+                                </optgroup>
+                                <optgroup label="💆 Skin & Beauty">
+                                    <option value="Exfoliate, Steam, Massage & Moisturise" data-duration="45">Exfoliate, Steam, Massage &amp; Moisturise — £25</option>
+                                    <option value="Full Head Colour" data-duration="45">Full Head Colour — £20</option>
+                                    <option value="Full Face Wax" data-duration="20">Full Face Wax — £10</option>
+                                    <option value="Ears Wax" data-duration="15">Ears Wax — £4</option>
+                                    <option value="Nose Wax" data-duration="15">Nose Wax — £4</option>
+                                    <option value="Face Cleaner Max" data-duration="30">Face Cleaner Max — £10</option>
+                                    <option value="Steam & Scrub" data-duration="30">Steam &amp; Scrub — £10</option>
+                                    <option value="Hair Remover (Thread)" data-duration="20">Hair Remover (Thread) — £5</option>
+                                </optgroup>
+                                <optgroup label="🚿 Hair Care">
+                                    <option value="Hair Wash & Hair Curl Cream" data-duration="20">Hair Wash &amp; Hair Curl Cream — £5</option>
+                                </optgroup>
+                            </select>
+                            <p id="service-duration-note" class="text-[11px] text-zinc-500 pl-1 h-4"></p>
+                        </div>
+
+                        <!-- STEP 2: Barber Preference -->
+                        <div class="space-y-3">
+                            <label class="text-[11px] uppercase font-bold tracking-widest text-zinc-400 flex items-center"><i class="fa-solid fa-user-tie w-5 text-zinc-600"></i> Barber</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button type="button" id="pref-anyone" onclick="setBarberPref('anyone')"
+                                    class="barber-pref-btn active-pref border border-white bg-white text-black p-4 text-center transition duration-300">
+                                    <p class="text-[11px] font-black uppercase tracking-widest">Anyone Available</p>
+                                    <p class="text-[9px] text-zinc-500 mt-1 font-normal normal-case tracking-normal">First available barber</p>
+                                </button>
+                                <button type="button" id="pref-specific" onclick="setBarberPref('specific')"
+                                    class="barber-pref-btn border border-zinc-800 bg-zinc-900/30 text-white p-4 text-center hover:border-zinc-500 transition duration-300">
+                                    <p class="text-[11px] font-black uppercase tracking-widest">Specific Barber</p>
+                                    <p class="text-[9px] text-zinc-500 mt-1 font-normal normal-case tracking-normal">Check availability first</p>
+                                </button>
+                            </div>
+
+                            <!-- Specific barber picker — hidden until "Specific Barber" chosen -->
+                            <div id="specific-barber-panel" class="hidden space-y-3 pt-1">
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    <label class="cursor-pointer group"><input type="radio" name="barber" value="Sisay" class="peer sr-only" onchange="onBarberRadioChange()">
+                                        <div class="border border-zinc-800 bg-zinc-900/30 p-3 text-center peer-checked:border-white peer-checked:bg-white peer-checked:text-black group-hover:border-zinc-500 transition duration-300"><p class="text-[11px] font-black uppercase tracking-widest">Sisay</p></div>
+                                    </label>
+                                    <label class="cursor-pointer group"><input type="radio" name="barber" value="Robel" class="peer sr-only" onchange="onBarberRadioChange()">
+                                        <div class="border border-zinc-800 bg-zinc-900/30 p-3 text-center peer-checked:border-white peer-checked:bg-white peer-checked:text-black group-hover:border-zinc-500 transition duration-300"><p class="text-[11px] font-black uppercase tracking-widest">Robel</p></div>
+                                    </label>
+                                    <label class="cursor-pointer group"><input type="radio" name="barber" value="Nathan" class="peer sr-only" onchange="onBarberRadioChange()">
+                                        <div class="border border-zinc-800 bg-zinc-900/30 p-3 text-center peer-checked:border-white peer-checked:bg-white peer-checked:text-black group-hover:border-zinc-500 transition duration-300"><p class="text-[11px] font-black uppercase tracking-widest">Nathan</p></div>
+                                    </label>
+                                    <label class="cursor-pointer group"><input type="radio" name="barber" value="Yonas" class="peer sr-only" onchange="onBarberRadioChange()">
+                                        <div class="border border-zinc-800 bg-zinc-900/30 p-3 text-center peer-checked:border-white peer-checked:bg-white peer-checked:text-black group-hover:border-zinc-500 transition duration-300"><p class="text-[11px] font-black uppercase tracking-widest">Yonas</p></div>
+                                    </label>
+                                    <label class="cursor-pointer group"><input type="radio" name="barber" value="Dave" class="peer sr-only" onchange="onBarberRadioChange()">
+                                        <div class="border border-zinc-800 bg-zinc-900/30 p-3 text-center peer-checked:border-white peer-checked:bg-white peer-checked:text-black group-hover:border-zinc-500 transition duration-300"><p class="text-[11px] font-black uppercase tracking-widest">Dave</p></div>
+                                    </label>
+                                </div>
+                                <!-- Availability alert banner -->
+                                <div id="availability-alert" class="hidden text-xs p-4 border leading-relaxed"></div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: Date & Time -->
+                        <div class="space-y-3">
+                            <label class="text-[11px] uppercase font-bold tracking-widest text-zinc-400 flex items-center gap-2">
+                                <i class="fa-regular fa-calendar-check w-5 text-zinc-600"></i>
+                                <span id="time-slot-label">Date & Time</span>
+                            </label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <input type="date" id="date-picker" required onchange="updateTimeSlots()" class="w-full bg-zinc-900/50 border border-zinc-800 text-white text-sm p-4 focus:border-zinc-500 focus:outline-none transition [color-scheme:dark] font-medium tracking-wide">
+                                <select id="form-time" required onchange="checkAvailability()" class="w-full bg-zinc-900/50 border border-zinc-800 text-white text-sm p-4 focus:border-zinc-500 focus:outline-none transition font-medium tracking-wide">
+                                    <option value="" disabled selected>Pick a service first</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- STEP 4: Your Details -->
+                        <div class="space-y-3 pt-2">
+                            <label class="text-[11px] uppercase font-bold tracking-widest text-zinc-400 flex items-center"><i class="fa-regular fa-address-card w-5 text-zinc-600"></i> Your Details</label>
+                            <div class="space-y-4">
+                                <div class="relative">
+                                    <i class="fa-regular fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 text-sm"></i>
+                                    <input type="text" id="form-name" placeholder="Full Name" required class="w-full bg-zinc-900/50 border border-zinc-800 text-white text-sm py-4 pl-11 pr-4 focus:border-zinc-500 focus:outline-none transition font-medium tracking-wide placeholder-zinc-600">
+                                </div>
+                                <div class="relative">
+                                    <i class="fa-solid fa-mobile-screen absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 text-sm"></i>
+                                    <input type="tel" id="form-phone" placeholder="Mobile Number" required class="w-full bg-zinc-900/50 border border-zinc-800 text-white text-sm py-4 pl-11 pr-4 focus:border-zinc-500 focus:outline-none transition font-medium tracking-wide placeholder-zinc-600">
+                                </div>
+                                <div class="relative">
+                                    <i class="fa-regular fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 text-sm"></i>
+                                    <input type="email" id="form-email" placeholder="Email Address — for confirmation" required class="w-full bg-zinc-900/50 border border-zinc-800 text-white text-sm py-4 pl-11 pr-4 focus:border-zinc-500 focus:outline-none transition font-medium tracking-wide placeholder-zinc-600">
+                                </div>
+                                <p class="text-[10px] text-zinc-500 pl-1">We'll send your booking confirmation here. No spam, ever.</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 space-y-3">
+                            <button type="submit" id="submit-btn" class="w-full bg-white text-black font-black uppercase tracking-widest px-8 py-5 text-sm hover:bg-zinc-200 transition duration-300 border-2 border-white">
+                                Confirm Appointment
+                            </button>
+                            <div id="email-sending-note" class="hidden text-center text-[11px] text-zinc-500">Sending confirmation email…</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═════════════════════════════════════════════════  FAQ ═══ -->
+        <section id="faq" class="py-16 px-6 border-t border-zinc-900 bg-zinc-950">
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 text-left">
+
+                <div class="space-y-12">
+                    <div class="space-y-2 border-l-2 border-white pl-4 relative">
+                        <h2 class="text-3xl font-black uppercase tracking-tight">Reviews</h2>
+                        <p class="text-zinc-500 text-xs uppercase tracking-widest font-semibold">What customers say</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4">
+                        <a href="https://maps.google.com" target="_blank" class="block p-6 border border-zinc-900 bg-zinc-900/20 hover:border-zinc-700 hover:bg-zinc-900/40 transition duration-300 space-y-4 group cursor-pointer">
+                            <div class="flex items-center justify-between">
+                                <div class="flex text-amber-400 space-x-0.5 text-xs">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                </div>
+                                <div class="flex items-center space-x-1.5 text-zinc-500 group-hover:text-zinc-300 transition">
+                                    <i class="fa-brands fa-google"></i>
+                                    <span class="text-[9px] uppercase tracking-widest font-bold">Verified</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-1 opacity-40 group-hover:opacity-100 transition"></i>
+                                </div>
+                            </div>
+                            <p class="text-zinc-300 text-sm font-light leading-relaxed">"Best fade in Walsall. Sharp, clean, and consistent."</p>
+                            <p class="text-[10px] uppercase tracking-widest text-white font-bold">— Daniel Roberts</p>
+                        </a>
+                        <a href="https://maps.google.com" target="_blank" class="block p-6 border border-zinc-900 bg-zinc-900/20 hover:border-zinc-700 hover:bg-zinc-900/40 transition duration-300 space-y-4 group cursor-pointer">
+                            <div class="flex items-center justify-between">
+                                <div class="flex text-amber-400 space-x-0.5 text-xs">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                </div>
+                                <div class="flex items-center space-x-1.5 text-zinc-500 group-hover:text-zinc-300 transition">
+                                    <i class="fa-brands fa-google"></i>
+                                    <span class="text-[9px] uppercase tracking-widest font-bold">Verified</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-1 opacity-40 group-hover:opacity-100 transition"></i>
+                                </div>
+                            </div>
+                            <p class="text-zinc-300 text-sm font-light leading-relaxed">"Great barbers, fair prices, and always a clean finish."</p>
+                            <p class="text-[10px] uppercase tracking-widest text-white font-bold">— Kieran M.</p>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="space-y-12">
+                    <div class="space-y-2 border-l-2 border-white pl-4">
+                        <h2 class="text-3xl font-black uppercase tracking-tight">Questions</h2>
+                        <p class="text-zinc-500 text-xs uppercase tracking-widest font-semibold">Quick answers</p>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="border border-zinc-900 bg-zinc-900/10">
+                            <button class="faq-accordion-toggle w-full flex justify-between items-center p-5 text-sm font-bold uppercase tracking-wider text-left focus:outline-none hover:bg-zinc-900/30 transition">
+                                <span>Do I need to book or can I just walk in?</span>
+                                <i class="fa-solid fa-plus text-xs text-zinc-500 transition-transform duration-200"></i>
+                            </button>
+                            <div class="faq-accordion-content hidden p-5 pt-0 text-zinc-400 text-sm font-light leading-relaxed border-t border-zinc-900/40">
+                                Walk-ins welcome. Book online to guarantee your slot.
+                            </div>
+                        </div>
+                        <div class="border border-zinc-900 bg-zinc-900/10">
+                            <button class="faq-accordion-toggle w-full flex justify-between items-center p-5 text-sm font-bold uppercase tracking-wider text-left focus:outline-none hover:bg-zinc-900/30 transition">
+                                <span>Where can I park nearby?</span>
+                                <i class="fa-solid fa-plus text-xs text-zinc-500 transition-transform duration-200"></i>
+                            </button>
+                            <div class="faq-accordion-content hidden p-5 pt-0 text-zinc-400 text-sm font-light leading-relaxed border-t border-zinc-900/40">
+                                Parking is available around the Shopping Centre. ASDA nearby offers up to 90 minutes free.
+                            </div>
+                        </div>
+                        <div class="border border-zinc-900 bg-zinc-900/10">
+                            <button class="faq-accordion-toggle w-full flex justify-between items-center p-5 text-sm font-bold uppercase tracking-wider text-left focus:outline-none hover:bg-zinc-900/30 transition">
+                                <span>Do you wash hair before a cut?</span>
+                                <i class="fa-solid fa-plus text-xs text-zinc-500 transition-transform duration-200"></i>
+                            </button>
+                            <div class="faq-accordion-content hidden p-5 pt-0 text-zinc-400 text-sm font-light leading-relaxed border-t border-zinc-900/40">
+                                Yes. Add a hair wash to any service or choose Full Service.
+                            </div>
+                        </div>
+                        <div class="border border-zinc-900 bg-zinc-900/10">
+                            <button class="faq-accordion-toggle w-full flex justify-between items-center p-5 text-sm font-bold uppercase tracking-wider text-left focus:outline-none hover:bg-zinc-900/30 transition">
+                                <span>How long does a cut take?</span>
+                                <i class="fa-solid fa-plus text-xs text-zinc-500 transition-transform duration-200"></i>
+                            </button>
+                            <div class="faq-accordion-content hidden p-5 pt-0 text-zinc-400 text-sm font-light leading-relaxed border-t border-zinc-900/40">
+                                Most cuts take around 30 minutes. Full services take 1 to 1.5 hours.
+                            </div>
+                        </div>
+                        <div class="border border-zinc-900 bg-zinc-900/10">
+                            <button class="faq-accordion-toggle w-full flex justify-between items-center p-5 text-sm font-bold uppercase tracking-wider text-left focus:outline-none hover:bg-zinc-900/30 transition">
+                                <span>What are your opening hours?</span>
+                                <i class="fa-solid fa-plus text-xs text-zinc-500 transition-transform duration-200"></i>
+                            </button>
+                            <div class="faq-accordion-content hidden p-5 pt-0 text-zinc-400 text-sm font-light leading-relaxed border-t border-zinc-900/40">
+                                Mon-Sat 9am-7pm. Sunday 10am-6pm.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════  LOCATION ═══ -->
+        <section id="location" class="py-16 px-6 border-t border-zinc-900 bg-zinc-950">
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                <div class="lg:col-span-1 space-y-6 text-left">
+                    <div class="space-y-2 border-l-2 border-white pl-4">
+                        <h2 class="text-3xl font-black uppercase tracking-tight">Visit</h2>
+                        <p class="text-zinc-500 text-xs uppercase tracking-widest font-semibold">Shopping Centre, Walsall</p>
+                    </div>
+                    <ul class="space-y-4 text-zinc-400 text-sm font-light">
+                        <li class="flex items-center"><i class="fa-solid fa-location-dot w-6 text-white"></i> Unit 12, Shopping Centre, Walsall, WS1 1PY</li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fa-regular fa-clock w-6 text-white mt-1"></i>
+                            <div>
+                                <p>Mon-Sat: 9:00 AM - 7:00 PM</p>
+                                <p>Sun: 10:00 AM - 6:00 PM</p>
+                            </div>
+                        </li>
+                        <li class="flex items-center"><i class="fa-solid fa-phone w-6 text-white"></i> 07386 032631</li>
+                        <li class="flex items-center"><i class="fa-regular fa-envelope w-6 text-white"></i> sisaygrmay12@gmail.com</li>
+                    </ul>
+                </div>
+                <div class="lg:col-span-2 border border-zinc-900 bg-zinc-900/20 p-2 h-[350px] relative">
+                    <div class="w-full h-full bg-zinc-950">
+                        <iframe src="https://maps.google.com/maps?q=Unit%2012,%20Shopping%20Centre,%20Walsall%20WS1%201PY&t=&z=16&ie=UTF8&iwloc=&output=embed" class="w-full h-full border-0 grayscale invert contrast-115" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ FOOTER ═══ -->
+    <footer class="bg-zinc-950 border-t border-zinc-900 py-6 px-4 text-zinc-500 text-xs tracking-wider w-full">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-4 text-[11px] text-zinc-600">
+                <i class="fa-solid fa-scissors text-zinc-700"></i>
+                <p>© 2026 Sis Barber Shop. All rights reserved.</p>
+            </div>
+            <p class="text-[11px] text-zinc-400 font-medium">
+                Designed & Built by <a href="https://hegeez.com" target="_blank" class="text-white hover:underline font-semibold tracking-wide transition duration-200">Hegeez</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- ═══════════════════════════════════════  BOOKING SUCCESS MODAL ═══ -->
+    <div id="success-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition duration-300">
+        <div class="bg-zinc-900 border border-zinc-800 p-8 max-w-md w-full relative shadow-2xl text-left space-y-6">
+            <div class="absolute top-0 left-0 w-full h-[2px] bg-white"></div>
+            <div class="flex items-center space-x-3 text-emerald-400">
+                <i class="fa-solid fa-circle-check text-2xl"></i>
+                <h3 class="text-lg font-black uppercase tracking-widest text-white">Booking Confirmed</h3>
+            </div>
+            <p class="text-zinc-400 text-xs font-light leading-relaxed">Your chair reservation has been safely registered. A confirmation will be sent to your mobile.</p>
+            <div class="border-y border-zinc-800 py-4 space-y-2.5 text-xs font-mono">
+                <div class="flex justify-between"><span class="text-zinc-500">CLIENT:</span><span id="modal-summary-name" class="text-white font-bold"></span></div>
+                <div class="flex justify-between"><span class="text-zinc-500">EMAIL:</span><span id="modal-summary-email" class="text-white font-bold"></span></div>
+                <div class="flex justify-between"><span class="text-zinc-500">SERVICE:</span><span id="modal-summary-service" class="text-white font-bold"></span></div>
+                <div class="flex justify-between"><span class="text-zinc-500">BARBER:</span><span id="modal-summary-barber" class="text-white font-bold"></span></div>
+                <div class="flex justify-between"><span class="text-zinc-500">SCHEDULE:</span><span id="modal-summary-datetime" class="text-white font-bold text-emerald-400"></span></div>
+            </div>
+            <div class="bg-zinc-950 border-l-2 border-emerald-500 p-4">
+                <p class="text-[10px] uppercase tracking-widest text-emerald-500 font-bold mb-1 flex items-center space-x-2"><i class="fa-solid fa-circle-info"></i><span>Need to adjust your time?</span></p>
+                <p class="text-zinc-400 text-xs font-light leading-relaxed">Call us at <a href="tel:07386032631" class="text-white font-bold hover:underline">07386 032631</a></p>
+            </div>
+            <button id="modal-close-btn" class="w-full bg-white text-black font-black uppercase tracking-widest py-3 text-xs hover:bg-zinc-200 transition duration-200">Close Window</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ AI CHATBOT ═══ -->
+    <!-- Chat Bubble -->
+    <div id="chat-bubble" role="button" aria-label="Open chat" title="Chat with us">
+        <span class="unread-dot"></span>
+        <i class="fa-solid fa-comment-dots chat-icon" id="chat-bubble-icon"></i>
+    </div>
+
+    <!-- Chat Window -->
+    <div id="chat-window" role="dialog" aria-label="Chat with Sis Barber Shop">
+        <div class="chat-gradient-top"></div>
+        <div class="chat-header">
+            <div class="chat-header-avatar">✂️</div>
+            <div class="chat-header-info">
+                <div class="name">Sis AI Assistant</div>
+                <div class="status">Online — Sis Barber Shop</div>
+            </div>
+            <button class="chat-close-btn" id="chat-close-btn" aria-label="Close chat">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="chat-messages" id="chat-messages"></div>
+
+        <div class="chat-quick-btns" id="chat-quick-btns">
+            <button class="quick-btn" data-msg="What are your prices?">Prices</button>
+            <button class="quick-btn" data-msg="How do I book an appointment?">Book</button>
+            <button class="quick-btn" data-msg="Where are you located?">Location</button>
+            <button class="quick-btn" data-msg="What are your opening hours?">Hours</button>
+        </div>
+
+        <div class="wa-fallback-banner" id="wa-fallback">
+            <i class="fa-brands fa-whatsapp wa-icon"></i>
+            <div class="wa-text">
+                <strong>Chat on WhatsApp</strong>
+                Still have questions? Message us directly
+            </div>
+            <i class="fa-solid fa-arrow-right text-zinc-600 text-xs ml-auto"></i>
+        </div>
+
+        <div class="chat-input-bar">
+            <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off" maxlength="300">
+            <button class="chat-send-btn" id="chat-send-btn" aria-label="Send message">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ SCRIPTS ═══ -->
+
+    <script>
+        // ══════════════════════════════════════════════════════════════════
+        // OFFICIAL EMBED LOADER — TikTok
+        // ──────────────────────────────────────────────────────────────────
+        // TikTok SDK injects iframe into blockquote. MutationObserver fades
+        // the shimmer overlay once the iframe appears.
+        // ══════════════════════════════════════════════════════════════════
+
+        function fadeShimmer(shimmerId) {
+            const el = document.getElementById(shimmerId);
+            if (!el) return;
+            el.classList.add('fade');
+            setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 550);
+        }
+
+        function watchForEmbed(shellId, shimmerId, timeoutMs) {
+            const shell = document.getElementById(shellId);
+            if (!shell) return;
+            // MutationObserver fires as soon as the platform script injects the iframe
+            const observer = new MutationObserver(() => {
+                if (shell.querySelector('iframe')) {
+                    observer.disconnect();
+                    fadeShimmer(shimmerId);
+                }
+            });
+            observer.observe(shell, { childList: true, subtree: true });
+            // Fallback: if no iframe appears within timeout, fade shimmer anyway
+            setTimeout(() => { observer.disconnect(); fadeShimmer(shimmerId); }, timeoutMs);
+        }
+
+        function initTikTok() {
+            // Watch both shells before loading script (race-safe)
+            watchForEmbed('tt-shell-1', 'tt-shim-1', 8000);
+            watchForEmbed('tt-shell-2', 'tt-shim-2', 8000);
+            const s = document.createElement('script');
+            s.src = 'https://www.tiktok.com/embed.js';
+            s.async = true;
+            document.body.appendChild(s);
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // EMAILJS CONFIG — https://emailjs.com (free, sends to any address)
+        // Step 1: emailjs.com → Email Services → Add Gmail → copy Service ID
+        // Step 2: Create template "Shop Alert"     → copy Template ID
+        // Step 3: Create template "Customer Confirm" → copy Template ID
+        // Step 4: Paste the 3 IDs below and you're done.
+        // ══════════════════════════════════════════════════════════════════
+        const EJS_PUBLIC_KEY    = 'nCvUdhb9aO6tV62Lq';
+        const EJS_SERVICE_ID    = 'service_ckgt9pd';
+        const EJS_TEMPLATE_SHOP = 'template_ypp1njr'; // Shop Alert template
+        const EJS_TEMPLATE_CUST = 'ogk2cp7';          // Customer Confirmation template
+        const SHOP_EMAIL        = 'sisaygrmay12@gmail.com';
+
+        // ══════════════════════════════════════════════════════════════════
+        // BOOKING ENGINE v2
+        // ── Service durations, opening hours, clash prevention, smart
+        //    suggestions. Bookings persisted in localStorage so double-
+        //    booking is prevented across page refreshes.
+        // ══════════════════════════════════════════════════════════════════
+
+        const BARBERS = ['Sis', 'Teddy'];
+
+        // Off days per barber: 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
+        const BARBER_OFF_DAYS = {
+            Sis:   [],
+            Teddy: [],
+        };
+
+        // Opening hours in minutes from midnight
+        const OPEN_MON_SAT = { open: 9 * 60, close: 19 * 60 };   // 09:00–19:00
+        const OPEN_SUN     = { open: 10 * 60, close: 18 * 60 };   // 10:00–18:00
+
+        // Service durations in minutes — keys match the option text prefix
+        const SERVICE_DURATIONS = {
+            'Full Service':                             90,
+            'Hair Cut, Wash, Hot Towel Shave':         60,
+            'Hair Cut (Skin Fade)':                    30,
+            'Hair Cut':                                30,
+            'Kid Hair Cut':                            30,
+            'Kids Skin Fade':                          30,
+            'Skin Fade & Beard':                       30,
+            'Beard Trim & Colour':                     30,
+            'Beard & Hair Colour':                     30,
+            'Beard Trim':                              30,
+            'Beard Colour':                            30,
+            'Exfoliate, Steam, Massage':               30,
+            'Full Head Colour':                        30,
+            'Full Face Wax':                           30,
+            'Ears Wax':                                30,
+            'Nose Wax':                                30,
+            'Face Cleaner Max':                        30,
+            'Steam & Scrub':                           30,
+            'Hair Wash':                               30,
+            'Hair Remover':                            30,
+        };
+
+        // ── Booking ledger (localStorage) ─────────────────────────────────
+        // Structure: { 'BarberName': { 'YYYY-MM-DD': [startMin, startMin, ...] } }
+        // Each entry = start minute of a booked slot (e.g. 9*60+30 = 570)
+        const LEDGER_KEY = 'sis_bookings_v1';
+
+        function getLedger() {
+            try { return JSON.parse(localStorage.getItem(LEDGER_KEY) || '{}'); }
+            catch { return {}; }
+        }
+
+        function saveLedger(ledger) {
+            try { localStorage.setItem(LEDGER_KEY, JSON.stringify(ledger)); }
+            catch {}
+        }
+
+        function addBookingToLedger(barberName, dateStr, startMin, durationMin) {
+            const ledger = getLedger();
+            if (!ledger[barberName]) ledger[barberName] = {};
+            if (!ledger[barberName][dateStr]) ledger[barberName][dateStr] = [];
+            // Store as [startMin, endMin] pair
+            ledger[barberName][dateStr].push([startMin, startMin + durationMin]);
+            saveLedger(ledger);
+        }
+
+        function getBookedRanges(barberName, dateStr) {
+            const ledger = getLedger();
+            return (ledger[barberName] || {})[dateStr] || [];
+        }
+
+        // ── Time helpers ──────────────────────────────────────────────────
+        function timeToMinutes(timeStr) {
+            // Parses "09:00 AM" / "01:30 PM" → minutes from midnight
+            const [hm, period] = timeStr.split(' ');
+            let [h, m] = hm.split(':').map(Number);
+            if (period === 'PM' && h !== 12) h += 12;
+            if (period === 'AM' && h === 12) h = 0;
+            return h * 60 + m;
+        }
+
+        function minutesToTime(min) {
+            const h24 = Math.floor(min / 60);
+            const m   = min % 60;
+            const period = h24 >= 12 ? 'PM' : 'AM';
+            const h12 = h24 % 12 || 12;
+            return `${String(h12).padStart(2,'0')}:${String(m).padStart(2,'0')} ${period}`;
+        }
+
+        function getHoursForDate(dateStr) {
+            if (!dateStr) return OPEN_MON_SAT;
+            const day = new Date(dateStr + 'T12:00:00').getDay();
+            return day === 0 ? OPEN_SUN : OPEN_MON_SAT;
+        }
+
+        function getServiceDuration() {
+            const sel = document.getElementById('form-service');
+            if (!sel || sel.selectedIndex < 0) return 30;
+            const opt = sel.options[sel.selectedIndex];
+            if (!opt || !opt.value) return 30; // placeholder selected
+            // Primary: read data-duration attribute set directly on the option
+            const attr = parseInt(opt.getAttribute('data-duration'));
+            if (!isNaN(attr) && attr > 0) return attr;
+            // Fallback: lookup by option value text
+            const val = opt.value || '';
+            for (const [key, dur] of Object.entries(SERVICE_DURATIONS)) {
+                if (val.startsWith(key)) return dur;
+            }
+            return 30;
+        }
+
+        // ── Slot clash check ──────────────────────────────────────────────
+        // Returns true if a new appointment of durationMin starting at startMin
+        // would clash with any existing booking for barberName on dateStr
+        function slotClashes(barberName, dateStr, startMin, durationMin) {
+            const ranges = getBookedRanges(barberName, dateStr);
+            const endMin = startMin + durationMin;
+            return ranges.some(([bStart, bEnd]) => startMin < bEnd && endMin > bStart);
+        }
+
+        // ── Is barber working that day ────────────────────────────────────
+        function barberWorksDay(name, dateStr) {
+            if (!dateStr) return true;
+            const day = new Date(dateStr + 'T12:00:00').getDay();
+            return !(BARBER_OFF_DAYS[name] || []).includes(day);
+        }
+
+        // ── Full availability check (day + clashes) ───────────────────────
+        function isBarberAvailableAtSlot(name, dateStr, startMin, durationMin) {
+            if (!barberWorksDay(name, dateStr)) return false;
+            if (slotClashes(name, dateStr, startMin, durationMin)) return false;
+            return true;
+        }
+
+        // ── Get all available barbers for a given slot ────────────────────
+        function getAvailableBarbersForSlot(dateStr, startMin, durationMin) {
+            return BARBERS.filter(b => isBarberAvailableAtSlot(b, dateStr, startMin, durationMin));
+        }
+
+        // ── Get next available slots for a specific barber ────────────────
+        function getNextAvailableSlots(barberName, dateStr, durationMin, limit = 3) {
+            if (!barberWorksDay(barberName, dateStr)) return [];
+            const hours = getHoursForDate(dateStr);
+            const slots = [];
+            for (let m = hours.open; m + durationMin <= hours.close; m += 30) {
+                if (!slotClashes(barberName, dateStr, m, durationMin)) {
+                    slots.push(minutesToTime(m));
+                    if (slots.length >= limit) break;
+                }
+            }
+            return slots;
+        }
+
+        // ── Rebuild time dropdown based on service duration + date ─────────
+        function durationLabel(min) {
+            if (min >= 90) return '1 hr 30 min';
+            if (min === 60) return '1 hour';
+            if (min === 45) return '45 min';
+            if (min === 40) return '40 min';
+            if (min === 30) return '30 min';
+            if (min === 20) return '20 min';
+            if (min === 15) return '15 min';
+            return min + ' min';
+        }
+
+        function updateTimeSlots() {
+            const sel     = document.getElementById('form-service');
+            const note    = document.getElementById('service-duration-note');
+            const timeEl  = document.getElementById('form-time');
+            const timeLbl = document.getElementById('time-slot-label');
+            if (!sel || !timeEl) return;
+
+            const opt      = sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
+            const hasService = opt && opt.value;  // empty value = placeholder
+
+            // If no service chosen yet, keep dropdown locked
+            if (!hasService) {
+                if (note) note.textContent = '';
+                if (timeLbl) timeLbl.textContent = 'Date & Time';
+                timeEl.innerHTML = '<option value="" disabled selected>Pick a service first</option>';
+                timeEl.disabled = true;
+                clearAvailabilityAlert();
+                return;
+            }
+
+            timeEl.disabled = false;
+            const duration = getServiceDuration();
+            const dateStr  = document.getElementById('date-picker')?.value || '';
+            const hours    = getHoursForDate(dateStr);
+
+            // Duration note under service select (purple accent)
+            if (note) {
+                note.textContent = `⏱ Appointment length: ${durationLabel(duration)}`;
+                note.style.color = '#a855f7';
+            }
+
+            // Time label shows duration
+            if (timeLbl) timeLbl.textContent = `Date & Time  ·  ${durationLabel(duration)} slot`;
+
+            // Rebuild dropdown — only slots where full appointment fits before closing
+            const prevVal = timeEl.value;
+            timeEl.innerHTML = '<option value="" disabled selected>Select a time</option>';
+
+            for (let m = hours.open; m + duration <= hours.close; m += 30) {
+                const label = minutesToTime(m);
+                const o = document.createElement('option');
+                o.value = label;
+                o.textContent = label;
+                timeEl.appendChild(o);
+            }
+
+            // Restore previous selection if still valid
+            if (prevVal) {
+                const match = [...timeEl.options].find(o => o.value === prevVal);
+                if (match) timeEl.value = prevVal;
+            }
+
+            // Re-run availability check
+            checkAvailability();
+        }
+
+        // ── Barber preference UI ──────────────────────────────────────────
+        let barberPref = 'anyone';
+
+        function setBarberPref(pref) {
+            barberPref = pref;
+            const anyoneBtn   = document.getElementById('pref-anyone');
+            const specificBtn = document.getElementById('pref-specific');
+            const panel       = document.getElementById('specific-barber-panel');
+
+            if (pref === 'anyone') {
+                anyoneBtn.className   = 'barber-pref-btn border border-white bg-white text-black p-4 text-center transition duration-300';
+                specificBtn.className = 'barber-pref-btn border border-zinc-800 bg-zinc-900/30 text-white p-4 text-center hover:border-zinc-500 transition duration-300';
+                panel.classList.add('hidden');
+                document.querySelectorAll('input[name="barber"]').forEach(r => r.checked = false);
+                clearAvailabilityAlert();
+            } else {
+                specificBtn.className = 'barber-pref-btn border border-white bg-white text-black p-4 text-center transition duration-300';
+                anyoneBtn.className   = 'barber-pref-btn border border-zinc-800 bg-zinc-900/30 text-white p-4 text-center hover:border-zinc-500 transition duration-300';
+                panel.classList.remove('hidden');
+                checkAvailability();
+            }
+        }
+
+        function onBarberRadioChange() { checkAvailability(); }
+
+        // ── Main availability checker — runs on any change ────────────────
+        function checkAvailability() {
+            if (barberPref !== 'specific') return;
+
+            const radio   = document.querySelector('input[name="barber"]:checked');
+            const dateStr = document.getElementById('date-picker')?.value || '';
+            const timeVal = document.getElementById('form-time')?.value || '';
+            const alertEl = document.getElementById('availability-alert');
+            if (!alertEl) return;
+
+            if (!radio) { alertEl.classList.add('hidden'); return; }
+            if (!dateStr || !timeVal) { alertEl.classList.add('hidden'); return; }
+
+            const name      = radio.value;
+            const startMin  = timeToMinutes(timeVal);
+            const duration  = getServiceDuration();
+            const available = isBarberAvailableAtSlot(name, dateStr, startMin, duration);
+
+            alertEl.classList.remove('hidden');
+
+            if (available) {
+                alertEl.className = 'text-xs p-4 border border-emerald-800 bg-emerald-950/40 text-emerald-300 leading-relaxed';
+                alertEl.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i><strong>${name}</strong> is free at ${timeVal} on ${formatDate(dateStr)}.`;
+            } else {
+                // Who IS available at this slot?
+                const freeBarbers = getAvailableBarbersForSlot(dateStr, startMin, duration);
+                // When is the chosen barber next free?
+                const nextSlots   = getNextAvailableSlots(name, dateStr, duration);
+
+                let html = `<i class="fa-solid fa-triangle-exclamation mr-2"></i><strong>${name}</strong> is already booked at ${timeVal}.<br><br>`;
+
+                if (freeBarbers.length > 0) {
+                    html += `<span class="text-white font-semibold">Available now at ${timeVal}:</span> ${freeBarbers.map(b => `<button type="button" onclick="pickSuggestedBarber('${b}')" class="underline text-blue-400 hover:text-blue-300 mx-1">${b}</button>`).join('')}<br>`;
+                }
+
+                if (nextSlots.length > 0) {
+                    html += `<br><span class="text-white font-semibold">${name}'s next free slots:</span> `;
+                    html += nextSlots.map(t => `<button type="button" onclick="pickSuggestedTime('${t}')" class="underline text-purple-400 hover:text-purple-300 mx-1">${t}</button>`).join('');
+                } else {
+                    html += `<br><span class="text-zinc-400">${name} has no more availability today. Try a different date.</span>`;
+                }
+
+                alertEl.className = 'text-xs p-4 border border-amber-800 bg-amber-950/30 text-amber-200 leading-relaxed';
+                alertEl.innerHTML = html;
+            }
+        }
+
+        // ── One-click suggestion helpers ──────────────────────────────────
+        function pickSuggestedBarber(name) {
+            const radio = document.querySelector(`input[name="barber"][value="${name}"]`);
+            if (radio) { radio.checked = true; checkAvailability(); }
+        }
+
+        function pickSuggestedTime(timeVal) {
+            const sel = document.getElementById('form-time');
+            if (sel) { sel.value = timeVal; checkAvailability(); }
+        }
+
+        function clearAvailabilityAlert() {
+            const el = document.getElementById('availability-alert');
+            if (el) { el.classList.add('hidden'); el.innerHTML = ''; }
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr + 'T12:00:00');
+            return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        const WHATSAPP_NUMBER = '447386032631'; // UK format no + for wa.me
+
+        function openWhatsApp(msg) {
+            const url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg || '');
+            window.open(url, '_blank');
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        // ── AI CHATBOT ENGINE ────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────
+
+        const KB = [
+            { q: ['price','prices','cost','how much','pricing','rate','rates','charge','menu','£'],
+              a: 'Here\'s what we charge:\n\n✂️ Hair Cut — £13\n✂️ Hair Cut (Skin Fade) — £15\n👦 Kids Hair Cut (Under 10) — £10\n👦 Kids Skin Fade — £12\n✂️🧔 Skin Fade & Beard — £20\n\n👑 Full Service — £36 (1.5 hrs)\n💈 Cut, Wash, Hot Towel Shave & Style — £25 (1 hr)\n\n🧔 Beard Trim — £10\n🧔 Beard Colour — £10\n🧔 Beard Trim & Colour — £17\n🧔 Beard & Hair Colour — £30\n\n💆 Exfoliate, Steam, Massage & Moisturise — £25\n💆 Full Head Colour — £20\n💆 Full Face Wax — £10\n💆 Ears Wax — £4 | Nose Wax — £4\n💆 Face Cleaner Max — £10\n💆 Steam & Scrub — £10\n💆 Hair Remover (Thread) — £5\n\n🚿 Hair Wash & Hair Curl Cream — £5' },
+            { q: ['book','appointment','reserve','slot','schedule','booking'],
+              a: 'Easy — scroll up to **Book Your Chair**, pick your service, choose a barber, set your date & time, and hit confirm. Done in 60 seconds.\n\nOr tap below to message us on WhatsApp.' },
+            { q: ['location','address','where','find you','unit 12','walsall'],
+              a: '📍 We\'re at Unit 12, Shopping Centre, Walsall WS1 1PY.\n\nParking tip: ASDA car park nearby gives up to 90 mins free.' },
+            { q: ['hours','open','opening','close','time','when'],
+              a: '🕘 We\'re open:\n\nMon–Sat: 9:00 AM – 7:00 PM\nSun: 10:00 AM – 6:00 PM\n\nWalk-ins welcome every day.' },
+            { q: ['phone','call','number','contact','telephone','email'],
+              a: '📞 Call us: **07386 032631**\n📧 Email: sisaygrmay12@gmail.com\n\nOr message us on WhatsApp below — we reply fast.' },
+            { q: ['wash','washing','machine','hair wash'],
+              a: 'Yes! We have a professional washing station with a full washing machine. You can add a hair wash to any service, or book the Full Service which includes everything. 🫧' },
+            { q: ['barber','team','staff','who','sisay','robel','nathan','yonas','dave'],
+              a: 'Our team:\n\n👑 Sisay — Lead Barber\n✂️ Robel — Senior Stylist\n💈 Nathan — Texture Expert\n🎯 Yonas — Detail Specialist\n⚡ Dave — Fade Technician\n\nYou can pick a specific barber when booking.' },
+            { q: ['walk in','walk-in','walkin','no appointment'],
+              a: 'Walk-ins are welcome! Just come in and we\'ll fit you in. To guarantee your slot though, booking online is quicker.' },
+            { q: ['how long','duration','time'],
+              a: 'Most services take around 30 minutes. The Full Service is 1.5 hours, and the Cut, Wash, Hot Towel Shave & Style is 1 hour. The booking form shows the time automatically when you pick a service.' },
+            { q: ['instagram','tiktok','social','follow','ig'],
+              a: 'Check out our fresh cuts on TikTok @sisaygrmay123 and Instagram @sisaygrmay12. Both feeds are live on the website 📱' },
+            { q: ['hello','hi','hey','sup','yo','hiya','good morning','good afternoon'],
+              a: 'Hey! Welcome to Sis Barber Shop ✂️\n\nAsk me anything — prices, booking, location, or hours.' },
+            { q: ['thanks','thank you','cheers','appreciate','great','perfect','brilliant'],
+              a: 'Any time! See you in the chair soon ✂️' },
+            { q: ['fade','skin fade','haircut','cut','trim','beard'],
+              a: 'We do precision skin fades, clean line-ups, beard sculpting, hot towel shaves and more.\n\n✂️ Hair Cut — £13\n✂️ Skin Fade — £15\n🧔 Beard Trim — £10\n\nWant to book?' },
+        ];
+
+        function getBotReply(msg) {
+            const lower = msg.toLowerCase();
+            for (const entry of KB) {
+                if (entry.q.some(keyword => lower.includes(keyword))) {
+                    return entry.a;
+                }
+            }
+            return null; // triggers WhatsApp fallback
+        }
+
+        function formatTime() {
+            return new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function addMessage(text, role) {
+            const container = document.getElementById('chat-messages');
+            const wrap = document.createElement('div');
+            wrap.className = 'chat-msg ' + role;
+
+            // Convert **bold** markdown
+            const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+
+            wrap.innerHTML = `<div class="bubble">${formatted}</div><div class="ts">${formatTime()}</div>`;
+            container.appendChild(wrap);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTyping() {
+            const container = document.getElementById('chat-messages');
+            const typing = document.createElement('div');
+            typing.className = 'chat-msg bot';
+            typing.id = 'typing-indicator';
+            typing.innerHTML = '<div class="bubble" style="padding:6px 14px;"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+            container.appendChild(typing);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function removeTyping() {
+            const el = document.getElementById('typing-indicator');
+            if (el) el.remove();
+        }
+
+        function triggerWhatsAppFallback(userMsg) {
+            removeTyping();
+            addMessage("I'm not sure about that one — but our team can answer instantly on WhatsApp. Tap below 👇", 'bot');
+            // Highlight the WA banner
+            const banner = document.getElementById('wa-fallback');
+            if (banner) {
+                banner.style.borderColor = 'rgba(37,211,102,0.6)';
+                banner.style.background = 'rgba(37,211,102,0.12)';
+                banner.onclick = () => openWhatsApp('Hi! I was asking: ' + userMsg);
+                banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function handleSend() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            // Remove unread dot after first interaction
+            document.querySelector('.unread-dot')?.remove();
+
+            addMessage(msg, 'user');
+            input.value = '';
+
+            // Hide quick buttons after first message
+            document.getElementById('chat-quick-btns').style.display = 'none';
+
+            showTyping();
+
+            setTimeout(() => {
+                removeTyping();
+                const reply = getBotReply(msg);
+                if (reply) {
+                    addMessage(reply, 'bot');
+                } else {
+                    triggerWhatsAppFallback(msg);
+                }
+            }, 900 + Math.random() * 400);
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        // ── DOM READY ────────────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ── Mobile Menu ──────────────────────────────────────────────
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const mobileDrawer = document.getElementById('mobile-menu');
+            const mobileClose = document.getElementById('mobile-menu-close');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+            const body = document.body;
+
+            const toggleMobileMenu = () => {
+                mobileDrawer.classList.toggle('translate-x-full');
+                body.classList.toggle('overflow-hidden');
+            };
+            mobileBtn?.addEventListener('click', toggleMobileMenu);
+            mobileClose?.addEventListener('click', toggleMobileMenu);
+            mobileLinks.forEach(link => link.addEventListener('click', () => {
+                mobileDrawer.classList.add('translate-x-full');
+                body.classList.remove('overflow-hidden');
+            }));
+
+            // ── Date Input ───────────────────────────────────────────────
+            const datePicker = document.getElementById('date-picker');
+            if (datePicker) datePicker.setAttribute('min', new Date().toISOString().split('T')[0]);
+
+            // ── Booking duration note on load ────────────────────────────
+            updateTimeSlots();
+
+            // ── FAQ Accordion ────────────────────────────────────────────
+            document.querySelectorAll('.faq-accordion-toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const content = toggle.nextElementSibling;
+                    const icon = toggle.querySelector('i');
+                    content.classList.toggle('hidden');
+                    if (content.classList.contains('hidden')) {
+                        icon.classList.replace('fa-minus', 'fa-plus');
+                        toggle.classList.remove('bg-zinc-900/30');
+                    } else {
+                        icon.classList.replace('fa-plus', 'fa-minus');
+                        toggle.classList.add('bg-zinc-900/30');
+                    }
+                });
+            });
+
+            // ── EmailJS init ─────────────────────────────────────────────
+            if (typeof emailjs !== 'undefined') emailjs.init(EJS_PUBLIC_KEY);
+
+            // ── Booking Form Submit ──────────────────────────────────────
+            const appointmentForm = document.getElementById('appointment-form');
+            const successModal = document.getElementById('success-modal');
+
+            appointmentForm?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const name      = document.getElementById('form-name').value.trim();
+                const phone     = document.getElementById('form-phone').value.trim();
+                const email     = document.getElementById('form-email').value.trim();
+                const service   = document.getElementById('form-service').value;
+                const dateStr   = document.getElementById('date-picker').value;
+                const time      = document.getElementById('form-time').value;
+                const dateLabel = formatDate(dateStr);
+                const duration  = getServiceDuration();
+                const startMin  = timeToMinutes(time);
+
+                // Determine confirmed barber
+                let confirmedBarber = 'First Available Barber';
+                if (barberPref === 'specific') {
+                    const radio = document.querySelector('input[name="barber"]:checked');
+                    if (radio) {
+                        const chosenName = radio.value;
+                        // Hard block at submit — prevent race condition
+                        if (!isBarberAvailableAtSlot(chosenName, dateStr, startMin, duration)) {
+                            const freeNow  = getAvailableBarbersForSlot(dateStr, startMin, duration);
+                            const nextFree = getNextAvailableSlots(chosenName, dateStr, duration);
+                            const alertEl  = document.getElementById('availability-alert');
+                            alertEl.classList.remove('hidden');
+                            alertEl.className = 'text-xs p-4 border border-red-800 bg-red-950/30 text-red-300 leading-relaxed';
+                            let html = `<i class="fa-solid fa-circle-xmark mr-2"></i><strong>${chosenName}</strong> is now booked at ${time}. `;
+                            if (freeNow.length) html += `Try: ${freeNow.map(b=>`<button type="button" onclick="pickSuggestedBarber('${b}')" class="underline text-blue-400 mx-1">${b}</button>`).join('')}`;
+                            if (nextFree.length) html += ` or ${chosenName}'s next free: ${nextFree.map(t=>`<button type="button" onclick="pickSuggestedTime('${t}')" class="underline text-purple-400 mx-1">${t}</button>`).join('')}`;
+                            alertEl.innerHTML = html;
+                            return;
+                        }
+                        confirmedBarber = chosenName;
+                    }
+                } else {
+                    // "Anyone available" — assign first free barber
+                    const free = getAvailableBarbersForSlot(dateStr, startMin, duration);
+                    if (free.length) confirmedBarber = free[0];
+                }
+
+                // ── Record booking in ledger (prevents double-booking) ────
+                if (confirmedBarber !== 'First Available Barber') {
+                    addBookingToLedger(confirmedBarber, dateStr, startMin, duration);
+                }
+
+                // Show WhatsApp confirmation
+                const waMsg = `New Booking — Sis Barber Shop\nService: ${service}\nBarber: ${confirmedBarber}\nDate: ${dateLabel} at ${time}\nName: ${name}\nPhone: ${phone}${email ? '\nEmail: ' + email : ''}`;
+                openWhatsApp(waMsg);
+
+                // Refresh time slot dropdown to reflect new booking
+                updateTimeSlots();
+
+                // Show sending note
+                const sendNote = document.getElementById('email-sending-note');
+                const submitBtn = document.getElementById('submit-btn');
+                sendNote.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending…';
+
+                // ── Send via EmailJS ──────────────────────────────────────
+                // EmailJS sends to any address — shop alert + customer copy.
+                // Needs EJS_SERVICE_ID + two template IDs pasted above.
+                const templateParams = {
+                    customer_name:  name,
+                    customer_phone: phone,
+                    customer_email: email,
+                    service:        service,
+                    barber:         confirmedBarber,
+                    date:           dateLabel,
+                    time:           time,
+                };
+
+                const ejsReady = typeof emailjs !== 'undefined' &&
+                                 EJS_SERVICE_ID.startsWith('service_');
+
+                if (ejsReady) {
+                    try {
+                        // 1. Shop alert — always
+                        await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_SHOP, {
+                            ...templateParams,
+                            to_email: SHOP_EMAIL,
+                            reply_to: email,
+                        });
+                    } catch (e) { console.warn('Shop email failed:', e); }
+
+                    try {
+                        // 2. Customer confirmation — always (email is required)
+                        await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_CUST, {
+                            ...templateParams,
+                            to_email: email,
+                            reply_to: SHOP_EMAIL,
+                        });
+                    } catch (e) { console.warn('Customer email failed:', e); }
+                } else {
+                    console.info('EmailJS not configured yet — paste Service ID + Template IDs to enable.');
+                }
+
+                // Show success modal
+                sendNote.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Confirm Appointment';
+
+                document.getElementById('modal-summary-name').textContent = name.toUpperCase();
+                document.getElementById('modal-summary-email').textContent = email || 'Not provided';
+                document.getElementById('modal-summary-service').textContent = service.split(' —')[0].toUpperCase();
+                document.getElementById('modal-summary-barber').textContent = confirmedBarber.toUpperCase();
+                document.getElementById('modal-summary-datetime').textContent = `${dateLabel} @ ${time}`;
+                successModal.classList.remove('hidden');
+            });
+
+            document.getElementById('modal-close-btn')?.addEventListener('click', () => {
+                successModal.classList.add('hidden');
+                appointmentForm.reset();
+                clearAvailabilityAlert();
+                setBarberPref('anyone');
+            });
+
+            // ── Chatbot ──────────────────────────────────────────────────
+            const chatBubble = document.getElementById('chat-bubble');
+            const chatWindow = document.getElementById('chat-window');
+            const chatCloseBtn = document.getElementById('chat-close-btn');
+            const chatInput = document.getElementById('chat-input');
+            const chatSendBtn = document.getElementById('chat-send-btn');
+            let chatOpen = false;
+
+            function toggleChat() {
+                chatOpen = !chatOpen;
+                chatWindow.classList.toggle('open', chatOpen);
+                document.getElementById('chat-bubble-icon').className = chatOpen
+                    ? 'fa-solid fa-xmark chat-icon'
+                    : 'fa-solid fa-comment-dots chat-icon';
+
+                if (chatOpen && document.getElementById('chat-messages').children.length === 0) {
+                    setTimeout(() => {
+                        addMessage('Hey! 👋 Welcome to Sis Barber Shop.\n\nAsk me anything — prices, booking, hours, location. I\'m here to help!', 'bot');
+                    }, 300);
+                }
+            }
+
+            chatBubble.addEventListener('click', toggleChat);
+            chatCloseBtn.addEventListener('click', () => { chatOpen = true; toggleChat(); });
+            chatSendBtn.addEventListener('click', handleSend);
+            chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleSend(); });
+
+            document.querySelectorAll('.quick-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    chatInput.value = btn.dataset.msg;
+                    handleSend();
+                });
+            });
+
+            document.getElementById('wa-fallback').addEventListener('click', function() {
+                openWhatsApp('Hi! I\'d like to enquire about Sis Barber Shop.');
+            });
+
+            // ── Load TikTok embeds ───────────────────────────────────────
+            initTikTok();
+
+        });
+    </script>
+</body>
+</html>
