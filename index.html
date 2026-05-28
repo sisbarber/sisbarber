@@ -1567,8 +1567,8 @@
         // ══════════════════════════════════════════════════════════════════
         const EJS_PUBLIC_KEY    = 'nCvUdhb9aO6tV62Lq';
         const EJS_SERVICE_ID    = 'service_ckgt9pd';
-        const EJS_TEMPLATE_SHOP = 'template_ypp1njr'; // Shop Alert template
-        const EJS_TEMPLATE_CUST = 'ogk2cp7';          // Customer Confirmation template
+        const EJS_TEMPLATE_SHOP = '4t7xc4h';   // Shop Alert template
+        const EJS_TEMPLATE_CUST = 'ogk2cp7';   // Customer Confirmation template
         const SHOP_EMAIL        = 'sisaygrmay12@gmail.com';
 
         // ══════════════════════════════════════════════════════════════════
@@ -2168,38 +2168,26 @@
 
                 if (ejsReady) {
                     try {
-                        // 1. Shop alert — uses shop template, always goes to SHOP_EMAIL
+                        // 1. Shop alert — internal notification
                         await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_SHOP, {
                             ...templateParams,
-                            to_email: SHOP_EMAIL,
-                            reply_to: email,
+                            to_email:  SHOP_EMAIL,
+                            reply_to:  email || SHOP_EMAIL,
                         });
                     } catch (e) { console.warn('Shop email failed:', e); }
 
                     try {
-                        // 2. Customer confirmation — pass recipient in both template var
-                        //    AND as the EmailJS options object so it works regardless of
-                        //    how the "To Email" field is configured in the dashboard.
+                        // 2. Customer confirmation
                         if (email) {
-                            await emailjs.send(
-                                EJS_SERVICE_ID,
-                                EJS_TEMPLATE_CUST,
-                                {
-                                    ...templateParams,
-                                    to_email:   email,
-                                    to_name:    name,
-                                    reply_to:   SHOP_EMAIL,
-                                },
-                                {
-                                    publicKey: EJS_PUBLIC_KEY,
-                                    // EmailJS ignores extra recipient keys in options,
-                                    // but the template vars above carry the address.
-                                }
-                            );
+                            await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_CUST, {
+                                ...templateParams,
+                                to_email:  email,
+                                reply_to:  SHOP_EMAIL,
+                            });
                         }
                     } catch (e) { console.warn('Customer email failed:', e); }
                 } else {
-                    console.info('EmailJS not configured yet — paste Service ID + Template IDs to enable.');
+                    console.info('EmailJS not configured yet.');
                 }
 
                 // Show success modal
