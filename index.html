@@ -2136,41 +2136,35 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Sending…';
 
-                // ── Send emails via Web3Forms ────────────────────────────
-                const bookingDetails = `New booking received:\n\nCustomer: ${name}\nPhone: ${phone}\nEmail: ${email || 'Not provided'}\nService: ${service}\nBarber: ${confirmedBarber}\nDate: ${dateLabel}\nTime: ${time}`;
-
-                const w3fSends = [
-                    fetch('https://api.web3forms.com/submit', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify({
-                            access_key: W3F_ACCESS_KEY,
-                            subject: `New Booking — ${name} · ${service}`,
-                            message: bookingDetails,
-                            from_name: 'Sis Barber Shop',
-                            replyto: email || SHOP_EMAIL,
-                        })
+                // ── Email 1: Shop alert via Web3Forms ───────────────────
+                const bookingDetails = `New booking:\n\nCustomer: ${name}\nPhone: ${phone}\nEmail: ${email || 'Not provided'}\nService: ${service}\nBarber: ${confirmedBarber}\nDate: ${dateLabel}\nTime: ${time}`;
+                fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        access_key: W3F_ACCESS_KEY,
+                        subject: `New Booking — ${name} · ${service}`,
+                        message: bookingDetails,
+                        from_name: 'Sis Barber Shop',
+                        replyto: email || SHOP_EMAIL,
                     })
-                ];
+                }).catch(e => console.warn('Shop alert failed:', e));
 
-                if (email) {
-                    w3fSends.push(
-                        fetch('https://api.web3forms.com/submit', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                            body: JSON.stringify({
-                                access_key: W3F_ACCESS_KEY,
-                                to: email,
-                                subject: `Booking Confirmed — ${service} at Sis Barber Shop`,
-                                message: `Hi ${name},\n\nYour appointment is confirmed!\n\nService: ${service}\nBarber: ${confirmedBarber}\nDate: ${dateLabel}\nTime: ${time}\n\nAddress: Unit 12, Shopping Centre, Walsall\nPhone: 07386032631\n\nSee you soon!\n— Sis Barber Shop`,
-                                from_name: 'Sis Barber Shop',
-                                replyto: SHOP_EMAIL,
-                            })
-                        })
-                    );
+                // ── Email 2: Customer confirmation via EmailJS ───────────
+                // template_j1tq3on — To Email field must be {{to_email}}
+                if (email && typeof emailjs !== 'undefined') {
+                    emailjs.send('service_ckgt9pd', 'template_j1tq3on', {
+                        customer_name:  name,
+                        customer_phone: phone,
+                        customer_email: email,
+                        service:        service,
+                        barber:         confirmedBarber,
+                        date:           dateLabel,
+                        time:           time,
+                        to_email:       email,
+                        reply_to:       SHOP_EMAIL,
+                    }).catch(e => console.warn('Customer email failed:', e));
                 }
-
-                try { await Promise.all(w3fSends); } catch(e) { console.warn('Email send failed:', e); }
 
                 // Show success modal
                 sendNote.classList.add('hidden');
