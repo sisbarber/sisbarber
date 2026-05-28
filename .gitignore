@@ -18,3 +18,10 @@ emailjs-customer-template.html
 emailjs-shop-template.html
 sis-barber-booking.skill
 .codex-preview/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
