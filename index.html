@@ -93,7 +93,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
     <style>
         select {
@@ -1558,13 +1557,7 @@
             document.body.appendChild(s);
         }
 
-        // ══════════════════════════════════════════════════════════════════
-        // EMAILJS CONFIG
-        // ══════════════════════════════════════════════════════════════════
-        const EJS_PUBLIC_KEY    = 'nCvUdhb9aO6tV62Lq';
-        const EJS_SERVICE_ID    = 'service_ckgt9pd';
-        const EJS_TEMPLATE_SHOP = '4t7xc4h';   // Shop Alert  — To Email: {{to_email}}
-        const EJS_TEMPLATE_CUST = 'ogk2cp7';   // Customer    — To Email: {{to_email}}
+        const W3F_ACCESS_KEY    = 'baf456b6-b6e7-4f08-b5da-1c48a6f8cdef';
         const SHOP_EMAIL        = 'sisaygrmay12@gmail.com';
 
         // ══════════════════════════════════════════════════════════════════
@@ -2051,9 +2044,6 @@
                 });
             });
 
-            // ── EmailJS init ─────────────────────────────────────────────
-            if (typeof emailjs !== 'undefined') emailjs.init(EJS_PUBLIC_KEY);
-
             // ── Booking Form Submit ──────────────────────────────────────
             const appointmentForm = document.getElementById('appointment-form');
             const successModal = document.getElementById('success-modal');
@@ -2146,41 +2136,41 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Sending…';
 
-                // ── Send via EmailJS ──────────────────────────────────────
-                // EmailJS sends to any address — shop alert + customer copy.
-                // Needs EJS_SERVICE_ID + two template IDs pasted above.
-                const templateParams = {
-                    customer_name:  name,
-                    customer_phone: phone,
-                    customer_email: email,
-                    service:        service,
-                    barber:         confirmedBarber,
-                    date:           dateLabel,
-                    time:           time,
-                };
+                // ── Send emails via Web3Forms ────────────────────────────
+                const bookingDetails = `New booking received:\n\nCustomer: ${name}\nPhone: ${phone}\nEmail: ${email || 'Not provided'}\nService: ${service}\nBarber: ${confirmedBarber}\nDate: ${dateLabel}\nTime: ${time}`;
 
-                // ── Send emails via EmailJS (parallel) ───────────────────
-                if (typeof emailjs !== 'undefined') {
-                    try {
-                        const sends = [
-                            emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_SHOP, {
-                                ...templateParams,
-                                to_email: SHOP_EMAIL,
-                                reply_to: email || SHOP_EMAIL,
+                const w3fSends = [
+                    fetch('https://api.web3forms.com/submit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({
+                            access_key: W3F_ACCESS_KEY,
+                            subject: `New Booking — ${name} · ${service}`,
+                            message: bookingDetails,
+                            from_name: 'Sis Barber Shop',
+                            replyto: email || SHOP_EMAIL,
+                        })
+                    })
+                ];
+
+                if (email) {
+                    w3fSends.push(
+                        fetch('https://api.web3forms.com/submit', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                            body: JSON.stringify({
+                                access_key: W3F_ACCESS_KEY,
+                                to: email,
+                                subject: `Booking Confirmed — ${service} at Sis Barber Shop`,
+                                message: `Hi ${name},\n\nYour appointment is confirmed!\n\nService: ${service}\nBarber: ${confirmedBarber}\nDate: ${dateLabel}\nTime: ${time}\n\nAddress: Unit 12, Shopping Centre, Walsall\nPhone: 07386032631\n\nSee you soon!\n— Sis Barber Shop`,
+                                from_name: 'Sis Barber Shop',
+                                replyto: SHOP_EMAIL,
                             })
-                        ];
-                        if (email) {
-                            sends.push(
-                                emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_CUST, {
-                                    ...templateParams,
-                                    to_email: email,
-                                    reply_to: SHOP_EMAIL,
-                                })
-                            );
-                        }
-                        await Promise.all(sends);
-                    } catch(e) { console.warn('Email send failed:', e); }
+                        })
+                    );
                 }
+
+                try { await Promise.all(w3fSends); } catch(e) { console.warn('Email send failed:', e); }
 
                 // Show success modal
                 sendNote.classList.add('hidden');
