@@ -2159,27 +2159,27 @@
                     time:           time,
                 };
 
-                // ── Send emails via EmailJS ───────────────────────────────
+                // ── Send emails via EmailJS (parallel) ───────────────────
                 if (typeof emailjs !== 'undefined') {
                     try {
-                        // 1. Shop alert
-                        await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_SHOP, {
-                            ...templateParams,
-                            to_email: SHOP_EMAIL,
-                            reply_to: email || SHOP_EMAIL,
-                        });
-                    } catch(e) { console.warn('Shop email failed:', e); }
-
-                    try {
-                        // 2. Customer confirmation
-                        if (email) {
-                            await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_CUST, {
+                        const sends = [
+                            emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_SHOP, {
                                 ...templateParams,
-                                to_email: email,
-                                reply_to: SHOP_EMAIL,
-                            });
+                                to_email: SHOP_EMAIL,
+                                reply_to: email || SHOP_EMAIL,
+                            })
+                        ];
+                        if (email) {
+                            sends.push(
+                                emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_CUST, {
+                                    ...templateParams,
+                                    to_email: email,
+                                    reply_to: SHOP_EMAIL,
+                                })
+                            );
                         }
-                    } catch(e) { console.warn('Customer email failed:', e); }
+                        await Promise.all(sends);
+                    } catch(e) { console.warn('Email send failed:', e); }
                 }
 
                 // Show success modal
