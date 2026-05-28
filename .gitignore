@@ -8,3 +8,13 @@ emailjs-customer-template.html
 emailjs-shop-template.html
 sis-barber-booking.skill
 .codex-preview/
+.DS_Store
+CLAUDE.md
+AGENTS.md
+NEW_PROJECT_PROMPT.md
+TEMPLATE_PROMPT.md
+deploy.sh
+emailjs-customer-template.html
+emailjs-shop-template.html
+sis-barber-booking.skill
+.codex-preview/
