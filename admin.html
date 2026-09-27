@@ -99,7 +99,7 @@ header{border-bottom:1px solid #18181b;padding:22px 0 18px;margin-bottom:24px;po
     <div class="gate-logo">Sis Barber Shop</div>
     <div class="gate-title">Bookings</div>
     <div class="gate-sub">Enter your access key</div>
-    <input type="password" id="key-input" placeholder="••••••" autocomplete="current-password">
+    <input type="text" id="key-input" placeholder="access key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="sis-access-key">
     <button class="btn" id="login-btn">Unlock</button>
     <div class="gate-err" id="gate-err"></div>
   </div>
@@ -190,8 +190,7 @@ async function tryLogin(){
     app.classList.remove('hidden');
     render();
   } else {
-    $('gate-err').textContent = 'Wrong key — try again';
-    $('key-input').value = '';
+    $('gate-err').textContent = LAST_ERR || 'Wrong key — try again';
   }
 }
 
@@ -201,17 +200,19 @@ $('logout-btn').onclick = () => {
 };
 
 // ── Fetch ────────────────────────────────────────────────
+let LAST_ERR = '';
 async function load(key){
   try{
     const r = await fetch(API + '?key=' + encodeURIComponent(key) + '&t=' + Date.now());
     const d = await r.json();
-    if(!d.ok) return false;
+    if(!d.ok){ LAST_ERR = d.error === 'unauthorised' ? 'Wrong key' : ('Server: ' + (d.error||'?')); return false; }
+    LAST_ERR = '';
     BOOKINGS = (d.bookings||[]).sort((a,b)=>{
       if(a.iso !== b.iso) return (a.iso||'').localeCompare(b.iso||'');
       return timeVal(a.time) - timeVal(b.time);
     });
     return true;
-  }catch(e){ console.warn(e); return false; }
+  }catch(e){ console.warn(e); LAST_ERR = 'Connection failed — ' + e.message; return false; }
 }
 
 $('refresh-btn').onclick = async () => {
