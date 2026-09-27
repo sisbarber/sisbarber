@@ -222,13 +222,26 @@ header{border-bottom:1px solid var(--line);padding:18px 0 15px;margin-bottom:20p
       <button class="tab on" data-f="today">Today</button>
       <button class="tab" data-f="tomorrow">Tomorrow</button>
       <button class="tab" data-f="upcoming">Upcoming</button>
-      <button class="tab" data-f="all">All</button>
+      <button class="tab" data-f="past">Past</button>
+      <button class="tab" data-f="customers">Customers</button>
+      <button class="tab" data-f="archive">Archive</button>
     </div>
 
     <div id="list"></div>
   </div>
 
   <button class="fab" id="add-btn"><i class="fa-solid fa-plus"></i> New Booking</button>
+</div>
+
+<!-- ══ CUSTOMER PROFILE ══ -->
+<div class="overlay hidden" id="cust-modal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-title" id="cust-name">Customer</div>
+      <button class="icon-btn" id="close-cust" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="cust-body"></div>
+  </div>
 </div>
 
 <div class="overlay hidden" id="modal" role="dialog" aria-modal="true">
@@ -275,7 +288,7 @@ header{border-bottom:1px solid var(--line);padding:18px 0 15px;margin-bottom:20p
 
 <script>
 // ═══════════════════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbwW5TfElumS8U4J7ZyY2IoEVw4yZqyPR0QSs03aSJ23Nw5wB4jZcW2QREQaHsSOONKh/exec';
+const API = 'https://script.google.com/macros/s/AKfycbx8lKSjdcW1Z_a12EXLVGIHmBast8b4L3AYw6AkVW4fGojmAH0yIeaABazV0t5CVzIr/exec';
 // ═══════════════════════════════════════════════════════════
 
 const WA_CC = '44';
@@ -371,13 +384,144 @@ async function setStatus(row, value){
 }
 
 async function del(row){
-  if(!confirm('Delete this booking? This cannot be undone.')) return;
+  if(!confirm('Move this booking to the Archive?\n\nYou can restore it later from the Archive tab.')) return;
   try{
     const d = await api({action:'delete',row:row});
     if(!d.ok) throw new Error(d.error||'failed');
-    await load(KEY); render(); toast('Booking deleted');
+    await load(KEY); render(); toast('Moved to Archive');
+  }catch(e){ toast('Could not archive — '+e.message,false); }
+}
+
+async function restore(row){
+  try{
+    const d = await api({action:'restore',row:row});
+    if(!d.ok) throw new Error(d.error||'failed');
+    await load(KEY); render(); toast('Booking restored');
+  }catch(e){ toast('Could not restore — '+e.message,false); }
+}
+
+async function destroy(row){
+  if(!confirm('Permanently delete this booking?\n\nThis erases it from the records and cannot be undone.')) return;
+  try{
+    const d = await api({action:'destroy',row:row});
+    if(!d.ok) throw new Error(d.error||'failed');
+    await load(KEY); render(); toast('Permanently deleted');
   }catch(e){ toast('Could not delete — '+e.message,false); }
 }
+
+/* ── Customer intelligence ───────────────────────────────── */
+function priceOf(service){
+  if(!CFG || !CFG.services) return 0;
+  const s = CFG.services.find(x=>x[0]===service);
+  return s && s[2] ? s[2] : 0;
+}
+
+function custKey(b){ return String(b.phone||'').replace(/\D/g,'') || ('e:'+String(b.email||'').toLowerCase()); }
+
+/** Groups every booking by person and works out their history. */
+function buildCustomers(){
+  const map = new Map();
+  BOOKINGS.forEach(b => {
+    if(b.status==='Deleted') return;
+    const k = custKey(b);
+    if(!k) return;
+    if(!map.has(k)) map.set(k, {key:k, name:b.name, phone:b.phone, email:b.email, visits:[]});
+    const c = map.get(k);
+    c.visits.push(b);
+    if(b.email && !c.email) c.email = b.email;
+    if((b.name||'').length > (c.name||'').length) c.name = b.name;
+  });
+
+  const out = [];
+  map.forEach(c => {
+    c.visits.sort((a,b)=> (b.iso||'').localeCompare(a.iso||''));
+    const done = c.visits.filter(v=>v.status==='Done');
+    const upcoming = c.visits.filter(v=>v.iso>=TODAY && v.status!=='Cancelled');
+    const past = c.visits.filter(v=>v.iso<TODAY);
+    c.total   = done.reduce((s,v)=>s+priceOf(v.service),0);
+    c.count   = c.visits.length;
+    c.doneCount = done.length;
+    c.pastCount = past.length;
+    c.upcoming  = upcoming.length;
+    c.lastVisit = past.length ? past[0] : null;
+    // most frequent service / barber
+    const tally = (arr,f)=>{const m={};arr.forEach(v=>{const k=f(v); if(k) m[k]=(m[k]||0)+1;});
+      return Object.keys(m).sort((a,b)=>m[b]-m[a])[0]||'';};
+    c.usualService = tally(c.visits, v=>v.service);
+    c.usualBarber  = tally(c.visits, v=>v.barber);
+    c.noShows = c.visits.filter(v=>v.status==='No-show').length;
+    out.push(c);
+  });
+  out.sort((a,b)=> b.count - a.count || (b.total - a.total));
+  return out;
+}
+
+function openCustomer(key){
+  const c = buildCustomers().find(x=>x.key===key);
+  if(!c) return;
+  $('cust-name').textContent = c.name;
+
+  const stat = (n,l,col) =>
+    `<div class="stat"><div class="stat-n" style="color:${col};font-size:28px">${n}</div><div class="stat-l">${l}</div></div>`;
+
+  let html = `<div class="stats" style="margin-bottom:20px">
+      ${stat(c.count,'Bookings','var(--blue)')}
+      ${stat(c.doneCount,'Completed','var(--purple)')}
+      ${stat('£'+c.total,'Spent','var(--text)')}
+    </div>`;
+
+  html += `<div class="c-meta" style="margin-bottom:20px">
+      <div class="chip e"><i class="fa-solid fa-phone"></i><span>${esc(c.phone)}</span></div>
+      ${c.email?`<div class="chip e"><i class="fa-solid fa-envelope"></i><span>${esc(c.email)}</span></div>`:''}
+      ${c.usualService?`<div class="chip b"><i class="fa-solid fa-scissors"></i><span>Usually: ${esc(c.usualService)}</span></div>`:''}
+      ${c.usualBarber?`<div class="chip p"><i class="fa-solid fa-user"></i><span>Usually with ${esc(c.usualBarber)}</span></div>`:''}
+    </div>`;
+
+  html += `<div style="display:flex;gap:9px;margin-bottom:22px">
+      <a class="act call" href="tel:${esc(String(c.phone).replace(/\s/g,''))}"><i class="fa-solid fa-phone"></i>Call</a>
+      <a class="act wa" href="${esc(waLink(c.phone,c.name,'',''))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>
+      <button class="act ok" onclick="rebook('${c.key}')"><i class="fa-solid fa-rotate-right"></i>Rebook</button>
+    </div>`;
+
+  html += `<div class="day-label">Visit history</div>`;
+  c.visits.forEach(v => {
+    const st = v.status||'Upcoming';
+    const pill = st==='Done'?'p-done':st==='Cancelled'||st==='No-show'?'p-cancelled':'p-up';
+    html += `<div class="card" style="padding:14px;margin-bottom:9px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+          <div>
+            <div style="font-size:16px;font-weight:700">${esc(v.date)}</div>
+            <div style="font-size:14px;color:var(--text2);margin-top:4px">${esc(v.time)} · ${esc(v.service)} · ${esc(v.barber)}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div class="pill ${pill}">${esc(st)}</div>
+            <div style="font-size:15px;color:var(--muted);margin-top:6px">£${priceOf(v.service)}</div>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  $('cust-body').innerHTML = html;
+  $('cust-modal').classList.remove('hidden');
+}
+
+function rebook(key){
+  const c = buildCustomers().find(x=>x.key===key);
+  if(!c) return;
+  $('cust-modal').classList.add('hidden');
+  if(!CFG) { loadConfig(); } else { buildForm(); }
+  $('f-name').value  = c.name;
+  $('f-phone').value = c.phone;
+  $('f-email').value = c.email || '';
+  if(c.usualService) $('f-service').value = c.usualService;
+  if(c.usualBarber)  $('f-barber').value  = c.usualBarber;
+  buildTimes();
+  $('form-err').textContent = '';
+  modal.classList.remove('hidden');
+}
+
+$('close-cust').onclick = () => $('cust-modal').classList.add('hidden');
+$('cust-modal').onclick = e => { if(e.target===$('cust-modal')) $('cust-modal').classList.add('hidden'); };
 
 function waLink(phone,name,date,time){
   let p=String(phone||'').replace(/\D/g,'');
@@ -387,40 +531,98 @@ function waLink(phone,name,date,time){
 }
 
 function render(){
-  const live = b => b.status!=='Cancelled';
+  const live = b => b.status!=='Cancelled' && b.status!=='Deleted';
   $('s-today').textContent = BOOKINGS.filter(b=>b.iso===TODAY && live(b)).length;
   $('s-tom').textContent   = BOOKINGS.filter(b=>b.iso===TOM && live(b)).length;
   $('s-week').textContent  = BOOKINGS.filter(b=>b.iso>=TODAY && b.iso<=WEEK && live(b)).length;
 
-  let rows = BOOKINGS;
-  if(FILTER==='today')    rows = BOOKINGS.filter(b=>b.iso===TODAY);
-  if(FILTER==='tomorrow') rows = BOOKINGS.filter(b=>b.iso===TOM);
-  if(FILTER==='upcoming') rows = BOOKINGS.filter(b=>b.iso>=TODAY);
-  if(FILTER==='all')      rows = [...BOOKINGS].reverse();
-
   const list = $('list');
-  if(!rows.length){
-    const w = FILTER==='today'?'today':FILTER==='tomorrow'?'tomorrow':'yet';
-    list.innerHTML = `<div class="empty"><i class="fa-regular fa-calendar"></i><p>No bookings ${w}</p></div>`;
+  const alive = b => b.status!=='Deleted';
+
+  // ── Customers view ──
+  if(FILTER==='customers'){
+    const cs = buildCustomers();
+    if(!cs.length){ list.innerHTML = `<div class="empty"><i class="fa-regular fa-user"></i><p>No customers yet</p></div>`; return; }
+    list.innerHTML = `<div class="day-label">${cs.length} customer${cs.length===1?'':'s'} · most frequent first</div>` +
+      cs.map(c => `
+        <div class="card" onclick="openCustomer('${c.key}')" style="cursor:pointer">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+            <div style="min-width:0">
+              <div class="c-name" style="margin-bottom:6px">${esc(c.name)}
+                ${c.count>=3?'<span class="src" style="color:var(--purple);border-color:var(--purple)">Regular</span>':''}
+                ${c.noShows?'<span class="src" style="color:var(--red);border-color:var(--red)">'+c.noShows+' no-show</span>':''}
+              </div>
+              <div style="font-size:15px;color:var(--text2)">
+                ${c.count} booking${c.count===1?'':'s'} · £${c.total} spent
+                ${c.upcoming?' · <span style="color:var(--blue)">'+c.upcoming+' upcoming</span>':''}
+              </div>
+              ${c.usualService?`<div style="font-size:14px;color:var(--muted);margin-top:5px">${esc(c.usualService)} · ${esc(c.usualBarber)}</div>`:''}
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color:var(--muted);flex-shrink:0"></i>
+          </div>
+        </div>`).join('');
     return;
   }
 
+  // ── Booking views ──
+  let rows = BOOKINGS.filter(alive);
+  let emptyWord = 'yet';
+  if(FILTER==='today')    { rows = rows.filter(b=>b.iso===TODAY); emptyWord='today'; }
+  if(FILTER==='tomorrow') { rows = rows.filter(b=>b.iso===TOM);   emptyWord='tomorrow'; }
+  if(FILTER==='upcoming') { rows = rows.filter(b=>b.iso>=TODAY); }
+  if(FILTER==='past')     { rows = rows.filter(b=>b.iso<TODAY).reverse(); emptyWord='in the past'; }
+  if(FILTER==='archive')  { rows = BOOKINGS.filter(b=>b.status==='Deleted').reverse(); emptyWord='in the archive'; }
+
+  if(!rows.length){
+    const icon = FILTER==='archive' ? 'fa-solid fa-box-archive' : 'fa-regular fa-calendar';
+    list.innerHTML = `<div class="empty"><i class="${icon}"></i><p>Nothing ${emptyWord}</p></div>`;
+    return;
+  }
+
+  // Past and Archive get a takings summary
+  if(FILTER==='past' || FILTER==='archive'){
+    const done = rows.filter(b=>b.status==='Done');
+    const takings = done.reduce((s,b)=>s+priceOf(b.service),0);
+    list.innerHTML = `<div class="stats" style="margin-bottom:20px">
+        <div class="stat blue"><div class="stat-n">${rows.length}</div><div class="stat-l">Bookings</div></div>
+        <div class="stat purple"><div class="stat-n">${done.length}</div><div class="stat-l">Completed</div></div>
+        <div class="stat white"><div class="stat-n">£${takings}</div><div class="stat-l">Takings</div></div>
+      </div>`;
+  } else {
+    list.innerHTML = '';
+  }
+
+  // How many times has this person booked? Drives the "Regular" badge.
+  const counts = {};
+  BOOKINGS.filter(alive).forEach(b=>{ const k=custKey(b); if(k) counts[k]=(counts[k]||0)+1; });
+
   let html='', lastDay=null;
+  const grouped = FILTER!=='today' && FILTER!=='tomorrow';
+
   rows.forEach(b => {
-    if((FILTER==='upcoming'||FILTER==='all') && b.date!==lastDay){
+    if(grouped && b.date!==lastDay){
       html += `<div class="day-label">${esc(b.date)||'No date'}</div>`; lastDay=b.date;
     }
     const st = b.status||'Upcoming';
-    const pill = st==='Done'?'p-done':st==='Cancelled'?'p-cancelled':'p-up';
+    const pill = st==='Done'?'p-done':(st==='Cancelled'||st==='No-show'||st==='Deleted')?'p-cancelled':'p-up';
     const phone = String(b.phone||'').replace(/\s/g,'');
+    const k = custKey(b);
+    const isRegular = counts[k] >= 3;
+    const archived = st==='Deleted';
 
     html += `
     <div class="card ${st!=='Upcoming'?'done':''}">
       <div class="card-top">
         <div><div class="c-time">${esc(b.time)}</div><div class="c-date">${esc(b.date)}</div></div>
-        <div class="pill ${pill}">${esc(st)}</div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="pill ${pill}">${esc(archived?'Archived':st)}</div>
+          <div style="font-size:15px;color:var(--muted);margin-top:7px">£${priceOf(b.service)}</div>
+        </div>
       </div>
-      <div class="c-name">${esc(b.name)}${b.source==='Phone'?'<span class="src">Phone</span>':''}</div>
+      <div class="c-name" ${k?`onclick="openCustomer('${k}')" style="cursor:pointer"`:''}>${esc(b.name)}
+        ${isRegular?'<span class="src" style="color:var(--purple);border-color:var(--purple)">Regular</span>':''}
+        ${b.source==='Phone'?'<span class="src">Phone</span>':''}
+      </div>
       <div class="c-meta">
         <div class="chip b"><i class="fa-solid fa-scissors"></i><span>${esc(b.service)}</span></div>
         <div class="chip p"><i class="fa-solid fa-user"></i><span>${esc(b.barber)}</span></div>
@@ -428,16 +630,21 @@ function render(){
         ${b.email?`<div class="chip e"><i class="fa-solid fa-envelope"></i><span>${esc(b.email)}</span></div>`:''}
       </div>
       <div class="c-actions">
-        <a class="act call" href="tel:${esc(phone)}"><i class="fa-solid fa-phone"></i>Call</a>
-        <a class="act wa" href="${esc(waLink(b.phone,b.name,b.date,b.time))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>
-        ${st==='Upcoming'
-          ? `<button class="act ok" onclick="setStatus(${b.row},'Done')"><i class="fa-solid fa-check"></i>Done</button>`
-          : `<button class="act" onclick="setStatus(${b.row},'Upcoming')"><i class="fa-solid fa-rotate-left"></i>Undo</button>`}
-        <button class="act del" onclick="del(${b.row})" aria-label="Delete booking"><i class="fa-solid fa-trash"></i></button>
+        ${archived ? `
+          <button class="act ok" onclick="restore(${b.row})"><i class="fa-solid fa-rotate-left"></i>Restore</button>
+          <button class="act del" onclick="destroy(${b.row})" style="flex:1"><i class="fa-solid fa-trash"></i>Delete forever</button>
+        ` : `
+          <a class="act call" href="tel:${esc(phone)}"><i class="fa-solid fa-phone"></i>Call</a>
+          <a class="act wa" href="${esc(waLink(b.phone,b.name,b.date,b.time))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>
+          ${st==='Upcoming'
+            ? `<button class="act ok" onclick="setStatus(${b.row},'Done')"><i class="fa-solid fa-check"></i>Done</button>`
+            : `<button class="act" onclick="setStatus(${b.row},'Upcoming')"><i class="fa-solid fa-rotate-left"></i>Undo</button>`}
+          <button class="act del" onclick="del(${b.row})" aria-label="Archive booking"><i class="fa-solid fa-box-archive"></i></button>
+        `}
       </div>
     </div>`;
   });
-  list.innerHTML = html;
+  list.innerHTML += html;
 }
 
 function buildForm(){
