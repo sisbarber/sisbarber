@@ -2,93 +2,135 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Bookings · Sis Barber Shop</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;min-height:100vh;padding-bottom:40px}
-.wrap{max-width:720px;margin:0 auto;padding:0 20px}
+body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  min-height:100vh;padding-bottom:110px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px}
+.hidden{display:none!important}
 
-/* ── Login ── */
+/* ══ Login ══ */
 #gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-.gate-box{width:100%;max-width:360px;text-align:center}
-.gate-logo{font-size:11px;letter-spacing:4px;color:#52525b;text-transform:uppercase;margin-bottom:14px}
-.gate-title{font-size:34px;font-weight:800;letter-spacing:-1px;margin-bottom:8px;
+.gate-box{width:100%;max-width:340px;text-align:center}
+.gate-logo{font-size:10px;letter-spacing:4px;color:#52525b;text-transform:uppercase;margin-bottom:16px}
+.gate-title{font-size:38px;font-weight:800;letter-spacing:-1.5px;margin-bottom:10px;
   background:linear-gradient(135deg,#3B82F6,#A855F7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.gate-sub{font-size:14px;color:#71717a;margin-bottom:32px}
-input[type=password],input[type=text]{width:100%;padding:16px 18px;background:#0D0D0D;border:1px solid #27272a;border-radius:12px;
-  color:#fff;font-size:16px;outline:none;transition:border-color .2s,box-shadow .2s;text-align:center;letter-spacing:2px}
-input:focus{border-color:#3B82F6;box-shadow:0 0 0 4px rgba(59,130,246,.12)}
-.btn{width:100%;padding:16px;margin-top:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#3B82F6,#A855F7);
-  color:#fff;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .2s,transform .12s}
-.btn:active{transform:scale(.98)}
-.btn:disabled{opacity:.5;cursor:default}
-.gate-err{color:#f87171;font-size:13px;margin-top:16px;min-height:18px}
+.gate-sub{font-size:14px;color:#71717a;margin-bottom:30px}
+.gate-err{color:#f87171;font-size:13px;margin-top:16px;min-height:34px;line-height:1.5}
 
-/* ── Header ── */
-header{border-bottom:1px solid #18181b;padding:22px 0 18px;margin-bottom:24px;position:sticky;top:0;background:rgba(0,0,0,.92);backdrop-filter:blur(14px);z-index:20}
+input,select{width:100%;padding:14px 16px;background:#0D0D0D;border:1px solid #27272a;border-radius:11px;
+  color:#fff;font-size:16px;outline:none;transition:border-color .18s,box-shadow .18s;font-family:inherit}
+input:focus,select:focus{border-color:#3B82F6;box-shadow:0 0 0 4px rgba(59,130,246,.12)}
+select{appearance:none;background-image:url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%227%22%20viewBox%3D%220%200%2012%207%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M1%201l5%205%205-5%22%20stroke%3D%22%2371717a%22%20stroke-width%3D%222%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat:no-repeat;background-position:right 16px center;padding-right:42px}
+#key-input{text-align:center;letter-spacing:3px}
+
+.btn{width:100%;padding:15px;border:none;border-radius:11px;background:linear-gradient(135deg,#3B82F6,#A855F7);
+  color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s;font-family:inherit}
+.btn:active{transform:scale(.985)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn-ghost{background:transparent;border:1px solid #27272a;color:#a1a1aa}
+#login-btn{margin-top:12px}
+
+/* ══ Header ══ */
+header{border-bottom:1px solid #18181b;padding:20px 0 16px;margin-bottom:22px;position:sticky;top:0;
+  background:rgba(0,0,0,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:30}
 .head-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{font-size:19px;font-weight:800;letter-spacing:-.4px}
-.brand span{color:#52525b;font-weight:500;font-size:11px;letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:2px}
+.brand span{color:#52525b;font-weight:600;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;display:block;margin-bottom:3px}
+.brand strong{font-size:19px;font-weight:800;letter-spacing:-.4px}
 .head-actions{display:flex;gap:8px}
 .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid #27272a;background:#0D0D0D;color:#a1a1aa;
-  font-size:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+  font-size:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center}
 .icon-btn:active{background:#18181b;color:#fff}
 .spin{animation:sp .8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 
-/* ── Stats ── */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
-.stat{background:#0D0D0D;border:1px solid #18181b;border-radius:14px;padding:16px 12px;text-align:center}
-.stat-n{font-size:28px;font-weight:800;line-height:1;letter-spacing:-1px}
-.stat-l{font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1.5px;margin-top:6px}
+/* ══ Stats ══ */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:20px}
+.stat{background:#0D0D0D;border:1px solid #18181b;border-radius:14px;padding:15px 10px;text-align:center}
+.stat-n{font-size:27px;font-weight:800;line-height:1;letter-spacing:-1px}
+.stat-l{font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1.5px;margin-top:7px}
 .blue .stat-n{color:#3B82F6}.purple .stat-n{color:#A855F7}.white .stat-n{color:#fff}
 
-/* ── Tabs ── */
-.tabs{display:flex;gap:6px;margin-bottom:20px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+/* ══ Tabs ══ */
+.tabs{display:flex;gap:6px;margin-bottom:18px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex-shrink:0;padding:9px 16px;border-radius:999px;border:1px solid #27272a;background:transparent;
-  color:#71717a;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tab{flex-shrink:0;padding:9px 15px;border-radius:999px;border:1px solid #27272a;background:transparent;
+  color:#71717a;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap;font-family:inherit}
 .tab.on{background:#fff;color:#000;border-color:#fff}
 
-/* ── Booking card ── */
-.card{background:#0D0D0D;border:1px solid #18181b;border-radius:16px;padding:18px;margin-bottom:12px;transition:border-color .2s}
-.card.done{opacity:.45}
-.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
-.c-time{font-size:22px;font-weight:800;letter-spacing:-.5px;line-height:1.1}
-.c-date{font-size:11px;color:#52525b;margin-top:3px;text-transform:uppercase;letter-spacing:1px}
+/* ══ Cards ══ */
+.day-label{font-size:10px;color:#52525b;text-transform:uppercase;letter-spacing:2px;margin:24px 0 10px;font-weight:700}
+.day-label:first-child{margin-top:0}
+.card{background:#0D0D0D;border:1px solid #18181b;border-radius:16px;padding:17px;margin-bottom:11px}
+.card.done{opacity:.42}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:13px}
+.c-time{font-size:23px;font-weight:800;letter-spacing:-.6px;line-height:1.05}
+.c-date{font-size:10px;color:#52525b;margin-top:4px;text-transform:uppercase;letter-spacing:1.2px}
 .pill{font-size:9px;font-weight:700;padding:5px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
 .p-up{background:rgba(59,130,246,.14);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
 .p-done{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.28)}
-.p-noshow{background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.28)}
-.c-name{font-size:17px;font-weight:700;margin-bottom:10px}
-.c-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.p-cancelled{background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.28)}
+.c-name{font-size:17px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.src{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#52525b;border:1px solid #27272a;padding:3px 7px;border-radius:5px}
+.c-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:13px}
 .chip{font-size:11px;padding:6px 11px;border-radius:8px;background:#141414;border:1px solid #1f1f1f;color:#a1a1aa}
-.chip i{margin-right:5px;font-size:10px}
+.chip i{margin-right:5px;font-size:10px;opacity:.8}
 .chip.b{border-left:2px solid #3B82F6}
 .chip.p{border-left:2px solid #A855F7}
-.c-actions{display:flex;gap:7px;flex-wrap:wrap;border-top:1px solid #18181b;padding-top:13px}
-.act{flex:1;min-width:64px;padding:10px 8px;border-radius:9px;border:1px solid #27272a;background:transparent;
-  color:#a1a1aa;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none;text-align:center;
-  display:flex;align-items:center;justify-content:center;gap:5px}
+.c-actions{display:flex;gap:7px;flex-wrap:wrap;border-top:1px solid #18181b;padding-top:12px}
+.act{flex:1;min-width:62px;padding:10px 6px;border-radius:9px;border:1px solid #27272a;background:transparent;
+  color:#a1a1aa;font-size:11px;font-weight:600;cursor:pointer;transition:all .18s;text-decoration:none;
+  display:flex;align-items:center;justify-content:center;gap:5px;font-family:inherit}
 .act:active{background:#18181b}
 .act.call{color:#60a5fa;border-color:rgba(59,130,246,.3)}
 .act.wa{color:#4ade80;border-color:rgba(34,197,94,.3)}
 .act.ok{color:#4ade80;border-color:rgba(34,197,94,.3)}
-.act.del{color:#f87171;border-color:rgba(248,113,113,.25);flex:0 0 44px;min-width:44px}
+.act.del{color:#f87171;border-color:rgba(248,113,113,.25);flex:0 0 42px;min-width:42px}
 
-/* ── Empty / loading ── */
-.empty{text-align:center;padding:64px 20px;color:#3f3f46}
-.empty i{font-size:38px;margin-bottom:16px;display:block;opacity:.4}
+.empty{text-align:center;padding:60px 20px;color:#3f3f46}
+.empty i{font-size:36px;margin-bottom:14px;display:block;opacity:.35}
 .empty p{font-size:14px}
-.skel{height:130px;background:linear-gradient(90deg,#0D0D0D,#141414,#0D0D0D);background-size:200% 100%;
-  animation:sh 1.3s infinite;border-radius:16px;margin-bottom:12px}
+.skel{height:128px;background:linear-gradient(90deg,#0D0D0D,#151515,#0D0D0D);background-size:200% 100%;
+  animation:sh 1.3s infinite;border-radius:16px;margin-bottom:11px}
 @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.hidden{display:none!important}
-.day-label{font-size:10px;color:#52525b;text-transform:uppercase;letter-spacing:2px;margin:22px 0 10px;font-weight:700}
-.day-label:first-child{margin-top:0}
+
+/* ══ FAB ══ */
+.fab{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:40;
+  padding:15px 26px;border-radius:999px;border:none;cursor:pointer;font-family:inherit;
+  background:linear-gradient(135deg,#3B82F6,#A855F7);color:#fff;font-size:14px;font-weight:700;
+  box-shadow:0 8px 28px rgba(59,130,246,.35);display:flex;align-items:center;gap:9px;
+  transition:transform .12s}
+.fab:active{transform:translateX(-50%) scale(.96)}
+
+/* ══ Modal ══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  z-index:50;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.sheet{background:#0A0A0A;border:1px solid #1f1f1f;border-radius:22px 22px 0 0;width:100%;max-width:520px;
+  max-height:92vh;overflow-y:auto;padding:24px 20px 34px;animation:up .26s cubic-bezier(.16,1,.3,1)}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.sheet-title{font-size:21px;font-weight:800;letter-spacing:-.5px}
+.field{margin-bottom:13px}
+.label{font-size:10px;color:#71717a;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px;display:block;font-weight:600}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-err{color:#f87171;font-size:13px;margin:12px 0 0;min-height:20px;line-height:1.5}
+.hint{font-size:11px;color:#52525b;margin-top:6px;line-height:1.5}
+
+/* ══ Toast ══ */
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);z-index:60;
+  padding:13px 20px;border-radius:11px;font-size:13px;font-weight:600;max-width:90vw;text-align:center;
+  animation:pop .24s cubic-bezier(.16,1,.3,1)}
+.toast.ok{background:#052e16;color:#4ade80;border:1px solid rgba(34,197,94,.35)}
+.toast.bad{background:#2a0a0a;color:#f87171;border:1px solid rgba(248,113,113,.35)}
+@keyframes pop{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 </style>
 </head>
 <body>
@@ -99,7 +141,8 @@ header{border-bottom:1px solid #18181b;padding:22px 0 18px;margin-bottom:24px;po
     <div class="gate-logo">Sis Barber Shop</div>
     <div class="gate-title">Bookings</div>
     <div class="gate-sub">Enter your access key</div>
-    <input type="text" id="key-input" placeholder="access key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="sis-access-key">
+    <input type="text" id="key-input" placeholder="access key" autocomplete="off"
+           autocorrect="off" autocapitalize="off" spellcheck="false" name="sis-access-key">
     <button class="btn" id="login-btn">Unlock</button>
     <div class="gate-err" id="gate-err"></div>
   </div>
@@ -109,19 +152,19 @@ header{border-bottom:1px solid #18181b;padding:22px 0 18px;margin-bottom:24px;po
 <div id="app" class="hidden">
   <header>
     <div class="wrap head-row">
-      <div class="brand"><span>Sis Barber Shop</span>Bookings</div>
+      <div class="brand"><span>Sis Barber Shop</span><strong>Bookings</strong></div>
       <div class="head-actions">
-        <button class="icon-btn" id="refresh-btn" title="Refresh"><i class="fa-solid fa-rotate-right"></i></button>
-        <button class="icon-btn" id="logout-btn" title="Lock"><i class="fa-solid fa-lock"></i></button>
+        <button class="icon-btn" id="refresh-btn" aria-label="Refresh"><i class="fa-solid fa-rotate-right"></i></button>
+        <button class="icon-btn" id="logout-btn" aria-label="Lock"><i class="fa-solid fa-lock"></i></button>
       </div>
     </div>
   </header>
 
   <div class="wrap">
     <div class="stats">
-      <div class="stat blue"><div class="stat-n" id="s-today">0</div><div class="stat-l">Today</div></div>
-      <div class="stat purple"><div class="stat-n" id="s-tom">0</div><div class="stat-l">Tomorrow</div></div>
-      <div class="stat white"><div class="stat-n" id="s-week">0</div><div class="stat-l">This Week</div></div>
+      <div class="stat blue"><div class="stat-n" id="s-today">–</div><div class="stat-l">Today</div></div>
+      <div class="stat purple"><div class="stat-n" id="s-tom">–</div><div class="stat-l">Tomorrow</div></div>
+      <div class="stat white"><div class="stat-n" id="s-week">–</div><div class="stat-l">Next 7 days</div></div>
     </div>
 
     <div class="tabs">
@@ -133,137 +176,203 @@ header{border-bottom:1px solid #18181b;padding:22px 0 18px;margin-bottom:24px;po
 
     <div id="list"></div>
   </div>
+
+  <button class="fab" id="add-btn"><i class="fa-solid fa-plus"></i> New Booking</button>
+</div>
+
+<!-- ══ ADD BOOKING ══ -->
+<div class="overlay hidden" id="modal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-title">New Booking</div>
+      <button class="icon-btn" id="close-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-name">Customer name</label>
+      <input type="text" id="f-name" placeholder="Full name" autocomplete="off">
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label class="label" for="f-phone">Phone</label>
+        <input type="tel" id="f-phone" placeholder="07…" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="label" for="f-email">Email <span style="color:#3f3f46">(optional)</span></label>
+        <input type="email" id="f-email" placeholder="name@email.com" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-service">Service</label>
+      <select id="f-service"></select>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-barber">Barber</label>
+      <select id="f-barber"></select>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label class="label" for="f-date">Date</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="field">
+        <label class="label" for="f-time">Time</label>
+        <select id="f-time"></select>
+      </div>
+    </div>
+
+    <div class="form-err" id="form-err"></div>
+    <button class="btn" id="save-btn">Confirm Booking</button>
+    <div class="hint">A confirmation email goes to the customer automatically if you add their address.</div>
+  </div>
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════════
-// Paste your Google Apps Script Web App URL here
-const API = 'https://script.google.com/macros/s/AKfycbw368lJpsgZHT0VvtJAG2FtgGL7L3JHq21hDkSw6AoHg5ssbT6itkuYtAGAF5lJyDen/exec';
-// ══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+const API = 'https://script.google.com/macros/s/AKfycbzbfDNSPqosDabls3oU1MY_RpU0deIze_QZIw2KFSOlVfVZIwMJBLSSgbtSnS095pLB/exec';
+// ═══════════════════════════════════════════════════════════
 
-const WHATSAPP_CC = '44';
+const WA_CC = '44';
 let KEY = localStorage.getItem('sis_admin_key') || '';
-let BOOKINGS = [];
-let FILTER = 'today';
+let BOOKINGS = [], CFG = null, FILTER = 'today', LAST_ERR = '';
 
 const $ = id => document.getElementById(id);
-const gate = $('gate'), app = $('app');
+const gate = $('gate'), app = $('app'), modal = $('modal');
 
-// ── Dates ────────────────────────────────────────────────
-function isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-const TODAY = isoOf(new Date());
-const TOM = (()=>{ const d=new Date(); d.setDate(d.getDate()+1); return isoOf(d); })();
-const WEEK_END = (()=>{ const d=new Date(); d.setDate(d.getDate()+7); return isoOf(d); })();
+/* ── dates ── */
+const iso = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const TODAY = iso(new Date());
+const TOM = (()=>{const d=new Date();d.setDate(d.getDate()+1);return iso(d);})();
+const WEEK = (()=>{const d=new Date();d.setDate(d.getDate()+7);return iso(d);})();
 
-// Sort by time of day (handles "09:30 AM")
 function timeVal(t){
-  if(!t) return 0;
   const m = String(t).match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
   if(!m) return 0;
-  let h = parseInt(m[1],10);
-  const mm = parseInt(m[2],10);
-  const ap = (m[3]||'').toUpperCase();
+  let h = +m[1]; const mm = +m[2]; const ap = (m[3]||'').toUpperCase();
   if(ap==='PM' && h!==12) h+=12;
   if(ap==='AM' && h===12) h=0;
   return h*60+mm;
 }
+function minToTime(min){
+  let h=Math.floor(min/60), m=min%60, ap=h>=12?'PM':'AM', hh=h%12||12;
+  return String(hh).padStart(2,'0')+':'+String(m).padStart(2,'0')+' '+ap;
+}
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-// ── Login ────────────────────────────────────────────────
+function toast(msg, ok=true){
+  const t = document.createElement('div');
+  t.className = 'toast ' + (ok?'ok':'bad');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 3200);
+}
+
+/* ── api ── */
+async function api(params){
+  const qs = new URLSearchParams(Object.assign({key:KEY, t:Date.now()}, params||{}));
+  const r = await fetch(API + '?' + qs.toString());
+  return await r.json();
+}
+
+async function load(key){
+  try{
+    const r = await fetch(API + '?key=' + encodeURIComponent(key) + '&t=' + Date.now());
+    const d = await r.json();
+    if(!d.ok){ LAST_ERR = d.error === 'unauthorised' ? 'Wrong key — try again' : ('Server: ' + (d.error||'?')); return false; }
+    LAST_ERR = '';
+    BOOKINGS = (d.bookings||[]).sort((a,b)=>
+      a.iso !== b.iso ? (a.iso||'').localeCompare(b.iso||'') : timeVal(a.time)-timeVal(b.time));
+    return true;
+  }catch(e){ LAST_ERR = 'Connection failed — ' + e.message; return false; }
+}
+
+async function loadConfig(){
+  try{
+    const d = await api({action:'config'});
+    if(d.ok) { CFG = d; buildForm(); }
+  }catch(e){ console.warn('config', e); }
+}
+
+/* ── login ── */
 $('login-btn').onclick = tryLogin;
 $('key-input').onkeydown = e => { if(e.key==='Enter') tryLogin(); };
 
 async function tryLogin(){
   const val = $('key-input').value.trim();
-  if(!val){ $('gate-err').textContent='Enter your key'; return; }
-  $('login-btn').disabled = true;
-  $('login-btn').textContent = 'Checking…';
+  if(!val){ $('gate-err').textContent = 'Enter your key'; return; }
+  $('login-btn').disabled = true; $('login-btn').textContent = 'Checking…';
   $('gate-err').textContent = '';
 
   const ok = await load(val);
-  $('login-btn').disabled = false;
-  $('login-btn').textContent = 'Unlock';
+  $('login-btn').disabled = false; $('login-btn').textContent = 'Unlock';
 
   if(ok){
     KEY = val;
     localStorage.setItem('sis_admin_key', val);
-    gate.classList.add('hidden');
-    app.classList.remove('hidden');
-    render();
+    gate.classList.add('hidden'); app.classList.remove('hidden');
+    render(); loadConfig();
   } else {
     $('gate-err').textContent = LAST_ERR || 'Wrong key — try again';
   }
 }
 
-$('logout-btn').onclick = () => {
-  localStorage.removeItem('sis_admin_key');
-  location.reload();
-};
-
-// ── Fetch ────────────────────────────────────────────────
-let LAST_ERR = '';
-async function load(key){
-  try{
-    const r = await fetch(API + '?key=' + encodeURIComponent(key) + '&t=' + Date.now());
-    const d = await r.json();
-    if(!d.ok){ LAST_ERR = d.error === 'unauthorised' ? 'Wrong key' : ('Server: ' + (d.error||'?')); return false; }
-    LAST_ERR = '';
-    BOOKINGS = (d.bookings||[]).sort((a,b)=>{
-      if(a.iso !== b.iso) return (a.iso||'').localeCompare(b.iso||'');
-      return timeVal(a.time) - timeVal(b.time);
-    });
-    return true;
-  }catch(e){ console.warn(e); LAST_ERR = 'Connection failed — ' + e.message; return false; }
-}
+$('logout-btn').onclick = () => { localStorage.removeItem('sis_admin_key'); location.reload(); };
 
 $('refresh-btn').onclick = async () => {
   const ic = $('refresh-btn').querySelector('i');
   ic.classList.add('spin');
-  $('list').innerHTML = '<div class="skel"></div><div class="skel"></div>';
   await load(KEY);
   ic.classList.remove('spin');
   render();
 };
 
-// ── Tabs ─────────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(t => {
   t.onclick = () => {
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
-    t.classList.add('on');
-    FILTER = t.dataset.f;
-    render();
+    t.classList.add('on'); FILTER = t.dataset.f; render();
   };
 });
 
-// ── Actions ──────────────────────────────────────────────
+/* ── actions ── */
 async function setStatus(row, value){
-  await fetch(API+'?key='+encodeURIComponent(KEY)+'&action=status&row='+row+'&value='+encodeURIComponent(value));
   const b = BOOKINGS.find(x=>x.row===row);
+  const prev = b ? b.status : null;
   if(b) b.status = value;
   render();
+  try{
+    const d = await api({action:'status', row:row, value:value});
+    if(!d.ok) throw new Error(d.error||'failed');
+  }catch(e){
+    if(b) b.status = prev;
+    render(); toast('Could not update — ' + e.message, false);
+  }
 }
 
 async function del(row){
-  if(!confirm('Delete this booking?')) return;
-  await fetch(API+'?key='+encodeURIComponent(KEY)+'&action=delete&row='+row);
-  await load(KEY);
-  render();
+  if(!confirm('Delete this booking? This cannot be undone.')) return;
+  try{
+    const d = await api({action:'delete', row:row});
+    if(!d.ok) throw new Error(d.error||'failed');
+    await load(KEY); render(); toast('Booking deleted');
+  }catch(e){ toast('Could not delete — ' + e.message, false); }
 }
 
 function waLink(phone, name, date, time){
   let p = String(phone||'').replace(/\D/g,'');
-  if(p.startsWith('0')) p = WHATSAPP_CC + p.slice(1);
+  if(p.startsWith('0')) p = WA_CC + p.slice(1);
   const msg = `Hi ${name}, this is Sis Barber Shop confirming your appointment on ${date} at ${time}. See you soon!`;
   return 'https://wa.me/'+p+'?text='+encodeURIComponent(msg);
 }
 
-function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-// ── Render ───────────────────────────────────────────────
+/* ── render ── */
 function render(){
-  // stats
-  $('s-today').textContent = BOOKINGS.filter(b=>b.iso===TODAY).length;
-  $('s-tom').textContent   = BOOKINGS.filter(b=>b.iso===TOM).length;
-  $('s-week').textContent  = BOOKINGS.filter(b=>b.iso>=TODAY && b.iso<=WEEK_END).length;
+  $('s-today').textContent = BOOKINGS.filter(b=>b.iso===TODAY && b.status!=='Cancelled').length;
+  $('s-tom').textContent   = BOOKINGS.filter(b=>b.iso===TOM && b.status!=='Cancelled').length;
+  $('s-week').textContent  = BOOKINGS.filter(b=>b.iso>=TODAY && b.iso<=WEEK && b.status!=='Cancelled').length;
 
   let rows = BOOKINGS;
   if(FILTER==='today')    rows = BOOKINGS.filter(b=>b.iso===TODAY);
@@ -272,34 +381,29 @@ function render(){
   if(FILTER==='all')      rows = [...BOOKINGS].reverse();
 
   const list = $('list');
-
   if(!rows.length){
-    list.innerHTML = `<div class="empty"><i class="fa-regular fa-calendar"></i><p>No bookings ${FILTER==='today'?'today':FILTER==='tomorrow'?'tomorrow':'yet'}</p></div>`;
+    const w = FILTER==='today'?'today':FILTER==='tomorrow'?'tomorrow':'yet';
+    list.innerHTML = `<div class="empty"><i class="fa-regular fa-calendar"></i><p>No bookings ${w}</p></div>`;
     return;
   }
 
   let html = '', lastDay = null;
   rows.forEach(b => {
-    // day separator when showing multiple days
     if((FILTER==='upcoming'||FILTER==='all') && b.date !== lastDay){
       html += `<div class="day-label">${esc(b.date)||'No date'}</div>`;
       lastDay = b.date;
     }
-
     const st = b.status || 'Upcoming';
-    const pill = st==='Done' ? 'p-done' : st==='No-show' ? 'p-noshow' : 'p-up';
+    const pill = st==='Done'?'p-done':st==='Cancelled'?'p-cancelled':'p-up';
     const phone = String(b.phone||'').replace(/\s/g,'');
 
     html += `
     <div class="card ${st!=='Upcoming'?'done':''}">
       <div class="card-top">
-        <div>
-          <div class="c-time">${esc(b.time)}</div>
-          <div class="c-date">${esc(b.date)}</div>
-        </div>
+        <div><div class="c-time">${esc(b.time)}</div><div class="c-date">${esc(b.date)}</div></div>
         <div class="pill ${pill}">${esc(st)}</div>
       </div>
-      <div class="c-name">${esc(b.name)}</div>
+      <div class="c-name">${esc(b.name)}${b.source==='Phone'?'<span class="src">Phone</span>':''}</div>
       <div class="c-meta">
         <div class="chip b"><i class="fa-solid fa-scissors"></i>${esc(b.service)}</div>
         <div class="chip p"><i class="fa-solid fa-user"></i>${esc(b.barber)}</div>
@@ -311,29 +415,97 @@ function render(){
         ${st==='Upcoming'
           ? `<button class="act ok" onclick="setStatus(${b.row},'Done')"><i class="fa-solid fa-check"></i>Done</button>`
           : `<button class="act" onclick="setStatus(${b.row},'Upcoming')"><i class="fa-solid fa-rotate-left"></i>Undo</button>`}
-        <button class="act del" onclick="del(${b.row})"><i class="fa-solid fa-trash"></i></button>
+        <button class="act del" onclick="del(${b.row})" aria-label="Delete"><i class="fa-solid fa-trash"></i></button>
       </div>
     </div>`;
   });
-
   list.innerHTML = html;
 }
 
-// ── Boot ─────────────────────────────────────────────────
-(async () => {
-  if(KEY){
-    gate.classList.add('hidden');
-    app.classList.remove('hidden');
-    $('list').innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
-    const ok = await load(KEY);
-    if(!ok){
-      localStorage.removeItem('sis_admin_key');
-      app.classList.add('hidden');
-      gate.classList.remove('hidden');
-      return;
-    }
-    render();
+/* ── add booking ── */
+function buildForm(){
+  if(!CFG) return;
+  $('f-service').innerHTML = CFG.services.map(s=>`<option value="${esc(s[0])}">${esc(s[0])}</option>`).join('');
+  $('f-barber').innerHTML  = '<option value="">Anyone available</option>' +
+    CFG.barbers.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
+  $('f-date').min = TODAY;
+  if(!$('f-date').value) $('f-date').value = TODAY;
+  buildTimes();
+}
+
+function buildTimes(){
+  if(!CFG) return;
+  const dv = $('f-date').value;
+  if(!dv){ $('f-time').innerHTML = '<option value="">Pick a date</option>'; return; }
+  const p = dv.split('-');
+  const dow = new Date(+p[0], +p[1]-1, +p[2]).getDay();
+  const hrs = CFG.hours[dow] || CFG.hours[1];
+  const svc = $('f-service').value;
+  const dur = (CFG.services.find(s=>s[0]===svc)||[null,30])[1];
+
+  let opts = '';
+  for(let m = hrs.open; m + dur <= hrs.close; m += 30) opts += `<option value="${minToTime(m)}">${minToTime(m)}</option>`;
+  $('f-time').innerHTML = opts || '<option value="">Closed</option>';
+}
+
+$('f-date').onchange = buildTimes;
+$('f-service').onchange = buildTimes;
+
+$('add-btn').onclick = () => {
+  $('form-err').textContent = '';
+  if(!CFG) loadConfig(); else buildForm();
+  modal.classList.remove('hidden');
+};
+$('close-modal').onclick = () => modal.classList.add('hidden');
+modal.onclick = e => { if(e.target === modal) modal.classList.add('hidden'); };
+
+$('save-btn').onclick = async () => {
+  const payload = {
+    action:  'create',
+    name:    $('f-name').value.trim(),
+    phone:   $('f-phone').value.trim(),
+    email:   $('f-email').value.trim(),
+    service: $('f-service').value,
+    barber:  $('f-barber').value,
+    date_iso:$('f-date').value,
+    time:    $('f-time').value
+  };
+
+  if(!payload.name)  return ($('form-err').textContent = 'Customer name is required');
+  if(!payload.phone) return ($('form-err').textContent = 'Phone number is required');
+  if(!payload.time)  return ($('form-err').textContent = 'Pick a time');
+
+  $('save-btn').disabled = true; $('save-btn').textContent = 'Saving…';
+  $('form-err').textContent = '';
+
+  try{
+    const d = await api(payload);
+    if(!d.ok) throw new Error(d.error || 'Could not save');
+    modal.classList.add('hidden');
+    ['f-name','f-phone','f-email'].forEach(id => $(id).value = '');
+    await load(KEY); render();
+    toast('Booking added for ' + d.booking.name);
+  }catch(e){
+    $('form-err').textContent = e.message;
+  }finally{
+    $('save-btn').disabled = false; $('save-btn').textContent = 'Confirm Booking';
   }
+};
+
+/* ── boot ── */
+(async () => {
+  if(!KEY) return;
+  gate.classList.add('hidden'); app.classList.remove('hidden');
+  $('list').innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+  const ok = await load(KEY);
+  if(!ok){
+    localStorage.removeItem('sis_admin_key');
+    app.classList.add('hidden'); gate.classList.remove('hidden');
+    $('gate-err').textContent = LAST_ERR;
+    return;
+  }
+  render(); loadConfig();
+  setInterval(async () => { if(document.visibilityState==='visible'){ await load(KEY); render(); } }, 60000);
 })();
 </script>
 </body>

@@ -1557,9 +1557,8 @@
             document.body.appendChild(s);
         }
 
-        const W3F_ACCESS_KEY    = 'baf456b6-b6e7-4f08-b5da-1c48a6f8cdef';
         // Google Apps Script Web App URL — powers the /admin booking dashboard
-        const BOOKINGS_API      = 'https://script.google.com/macros/s/AKfycbw368lJpsgZHT0VvtJAG2FtgGL7L3JHq21hDkSw6AoHg5ssbT6itkuYtAGAF5lJyDen/exec';
+        const BOOKINGS_API      = 'https://script.google.com/macros/s/AKfycbzbfDNSPqosDabls3oU1MY_RpU0deIze_QZIw2KFSOlVfVZIwMJBLSSgbtSnS095pLB/exec';
         const SHOP_EMAIL        = 'sisaygrmay12@gmail.com';
 
         // ══════════════════════════════════════════════════════════════════
@@ -2138,9 +2137,11 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Sending…';
 
-                // ── Save booking to the shop's dashboard ────────────────
-                if (BOOKINGS_API && BOOKINGS_API.indexOf('http') === 0) {
-                    fetch(BOOKINGS_API, {
+                // ── Save booking + send both confirmation emails ─────────
+                // One call: writes to the shop dashboard, emails the shop,
+                // and emails the customer. Handled server-side by Apps Script.
+                try {
+                    const res = await fetch(BOOKINGS_API, {
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({
@@ -2152,38 +2153,13 @@
                             date:     dateLabel,
                             date_iso: dateStr,
                             time:     time,
+                            source:   'Website'
                         })
-                    }).catch(e => console.warn('Dashboard save failed:', e));
-                }
-
-                // ── Email 1: Shop alert via Web3Forms ───────────────────
-                const bookingDetails = `New booking:\n\nCustomer: ${name}\nPhone: ${phone}\nEmail: ${email || 'Not provided'}\nService: ${service}\nBarber: ${confirmedBarber}\nDate: ${dateLabel}\nTime: ${time}`;
-                fetch('https://api.web3forms.com/submit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({
-                        access_key: W3F_ACCESS_KEY,
-                        subject: `New Booking — ${name} · ${service}`,
-                        message: bookingDetails,
-                        from_name: 'Sis Barber Shop',
-                        replyto: email || SHOP_EMAIL,
-                    })
-                }).catch(e => console.warn('Shop alert failed:', e));
-
-                // ── Email 2: Customer confirmation via EmailJS ───────────
-                // template_j1tq3on — To Email field must be {{to_email}}
-                if (email && typeof emailjs !== 'undefined') {
-                    emailjs.send('service_ckgt9pd', 'template_j1tq3on', {
-                        customer_name:  name,
-                        customer_phone: phone,
-                        customer_email: email,
-                        service:        service,
-                        barber:         confirmedBarber,
-                        date:           dateLabel,
-                        time:           time,
-                        to_email:       email,
-                        reply_to:       SHOP_EMAIL,
-                    }).catch(e => console.warn('Customer email failed:', e));
+                    });
+                    const out = await res.json();
+                    if (!out.ok) console.warn('Booking not saved:', out.error);
+                } catch (e) {
+                    console.warn('Booking save failed:', e);
                 }
 
                 // Show success modal
@@ -2300,7 +2276,7 @@
                 When you book an appointment, we collect your name, phone number, and email address. This is used solely to confirm your booking and contact you about your appointment.</p>
 
                 <p><strong style="color:#d4d4d8;">How we use your data</strong><br>
-                We use your contact details to send booking confirmations via email (EmailJS). We do not sell, share, or rent your data to any third party. We do not use your data for marketing without your consent.</p>
+                We use your contact details to send booking confirmations and appointment reminders by email. We do not sell, share, or rent your data to any third party. We do not use your data for marketing without your consent.</p>
 
                 <p><strong style="color:#d4d4d8;">Cookies</strong><br>
                 This site uses essential cookies only — these are required for the booking system to prevent double-bookings (stored locally in your browser). We do not use tracking cookies, advertising cookies, or analytics.</p>
@@ -2312,7 +2288,7 @@
                 You have the right to request access to, correction of, or deletion of your personal data. Contact us at sisaygrmay12@gmail.com to exercise these rights.</p>
 
                 <p><strong style="color:#d4d4d8;">Third-party services</strong><br>
-                We use EmailJS (emailjs.com) to send confirmation emails. Their privacy policy applies to email processing. We use Cloudflare for website delivery and security.</p>
+                Bookings and confirmation emails are processed by Google (Apps Script and Google Sheets); Google's privacy policy applies. We use Cloudflare for website delivery and security.</p>
 
                 <p><strong style="color:#d4d4d8;">Contact</strong><br>
                 Questions about this policy? Email us at <a href="mailto:sisaygrmay12@gmail.com" style="color:#3B82F6;">sisaygrmay12@gmail.com</a></p>
