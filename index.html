@@ -1558,6 +1558,8 @@
         }
 
         const W3F_ACCESS_KEY    = 'baf456b6-b6e7-4f08-b5da-1c48a6f8cdef';
+        // Google Apps Script Web App URL — powers the /admin booking dashboard
+        const BOOKINGS_API      = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
         const SHOP_EMAIL        = 'sisaygrmay12@gmail.com';
 
         // ══════════════════════════════════════════════════════════════════
@@ -2135,6 +2137,24 @@
                 sendNote.classList.remove('hidden');
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Sending…';
+
+                // ── Save booking to the shop's dashboard ────────────────
+                if (BOOKINGS_API && BOOKINGS_API.indexOf('http') === 0) {
+                    fetch(BOOKINGS_API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({
+                            name:     name,
+                            phone:    phone,
+                            email:    email || '',
+                            service:  service,
+                            barber:   confirmedBarber,
+                            date:     dateLabel,
+                            date_iso: dateStr,
+                            time:     time,
+                        })
+                    }).catch(e => console.warn('Dashboard save failed:', e));
+                }
 
                 // ── Email 1: Shop alert via Web3Forms ───────────────────
                 const bookingDetails = `New booking:\n\nCustomer: ${name}\nPhone: ${phone}\nEmail: ${email || 'Not provided'}\nService: ${service}\nBarber: ${confirmedBarber}\nDate: ${dateLabel}\nTime: ${time}`;

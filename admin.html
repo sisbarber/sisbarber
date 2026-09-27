@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Bookings · Sis Barber Shop</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;min-height:100vh;padding-bottom:40px}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px}
+
+/* ── Login ── */
+#gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.gate-box{width:100%;max-width:360px;text-align:center}
+.gate-logo{font-size:11px;letter-spacing:4px;color:#52525b;text-transform:uppercase;margin-bottom:14px}
+.gate-title{font-size:34px;font-weight:800;letter-spacing:-1px;margin-bottom:8px;
+  background:linear-gradient(135deg,#3B82F6,#A855F7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gate-sub{font-size:14px;color:#71717a;margin-bottom:32px}
+input[type=password],input[type=text]{width:100%;padding:16px 18px;background:#0D0D0D;border:1px solid #27272a;border-radius:12px;
+  color:#fff;font-size:16px;outline:none;transition:border-color .2s,box-shadow .2s;text-align:center;letter-spacing:2px}
+input:focus{border-color:#3B82F6;box-shadow:0 0 0 4px rgba(59,130,246,.12)}
+.btn{width:100%;padding:16px;margin-top:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#3B82F6,#A855F7);
+  color:#fff;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .2s,transform .12s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5;cursor:default}
+.gate-err{color:#f87171;font-size:13px;margin-top:16px;min-height:18px}
+
+/* ── Header ── */
+header{border-bottom:1px solid #18181b;padding:22px 0 18px;margin-bottom:24px;position:sticky;top:0;background:rgba(0,0,0,.92);backdrop-filter:blur(14px);z-index:20}
+.head-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:19px;font-weight:800;letter-spacing:-.4px}
+.brand span{color:#52525b;font-weight:500;font-size:11px;letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:2px}
+.head-actions{display:flex;gap:8px}
+.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid #27272a;background:#0D0D0D;color:#a1a1aa;
+  font-size:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.icon-btn:active{background:#18181b;color:#fff}
+.spin{animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+.stat{background:#0D0D0D;border:1px solid #18181b;border-radius:14px;padding:16px 12px;text-align:center}
+.stat-n{font-size:28px;font-weight:800;line-height:1;letter-spacing:-1px}
+.stat-l{font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1.5px;margin-top:6px}
+.blue .stat-n{color:#3B82F6}.purple .stat-n{color:#A855F7}.white .stat-n{color:#fff}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:6px;margin-bottom:20px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:9px 16px;border-radius:999px;border:1px solid #27272a;background:transparent;
+  color:#71717a;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tab.on{background:#fff;color:#000;border-color:#fff}
+
+/* ── Booking card ── */
+.card{background:#0D0D0D;border:1px solid #18181b;border-radius:16px;padding:18px;margin-bottom:12px;transition:border-color .2s}
+.card.done{opacity:.45}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+.c-time{font-size:22px;font-weight:800;letter-spacing:-.5px;line-height:1.1}
+.c-date{font-size:11px;color:#52525b;margin-top:3px;text-transform:uppercase;letter-spacing:1px}
+.pill{font-size:9px;font-weight:700;padding:5px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.p-up{background:rgba(59,130,246,.14);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.p-done{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.28)}
+.p-noshow{background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.28)}
+.c-name{font-size:17px;font-weight:700;margin-bottom:10px}
+.c-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{font-size:11px;padding:6px 11px;border-radius:8px;background:#141414;border:1px solid #1f1f1f;color:#a1a1aa}
+.chip i{margin-right:5px;font-size:10px}
+.chip.b{border-left:2px solid #3B82F6}
+.chip.p{border-left:2px solid #A855F7}
+.c-actions{display:flex;gap:7px;flex-wrap:wrap;border-top:1px solid #18181b;padding-top:13px}
+.act{flex:1;min-width:64px;padding:10px 8px;border-radius:9px;border:1px solid #27272a;background:transparent;
+  color:#a1a1aa;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:5px}
+.act:active{background:#18181b}
+.act.call{color:#60a5fa;border-color:rgba(59,130,246,.3)}
+.act.wa{color:#4ade80;border-color:rgba(34,197,94,.3)}
+.act.ok{color:#4ade80;border-color:rgba(34,197,94,.3)}
+.act.del{color:#f87171;border-color:rgba(248,113,113,.25);flex:0 0 44px;min-width:44px}
+
+/* ── Empty / loading ── */
+.empty{text-align:center;padding:64px 20px;color:#3f3f46}
+.empty i{font-size:38px;margin-bottom:16px;display:block;opacity:.4}
+.empty p{font-size:14px}
+.skel{height:130px;background:linear-gradient(90deg,#0D0D0D,#141414,#0D0D0D);background-size:200% 100%;
+  animation:sh 1.3s infinite;border-radius:16px;margin-bottom:12px}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.hidden{display:none!important}
+.day-label{font-size:10px;color:#52525b;text-transform:uppercase;letter-spacing:2px;margin:22px 0 10px;font-weight:700}
+.day-label:first-child{margin-top:0}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-logo">Sis Barber Shop</div>
+    <div class="gate-title">Bookings</div>
+    <div class="gate-sub">Enter your access key</div>
+    <input type="password" id="key-input" placeholder="••••••" autocomplete="current-password">
+    <button class="btn" id="login-btn">Unlock</button>
+    <div class="gate-err" id="gate-err"></div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="app" class="hidden">
+  <header>
+    <div class="wrap head-row">
+      <div class="brand"><span>Sis Barber Shop</span>Bookings</div>
+      <div class="head-actions">
+        <button class="icon-btn" id="refresh-btn" title="Refresh"><i class="fa-solid fa-rotate-right"></i></button>
+        <button class="icon-btn" id="logout-btn" title="Lock"><i class="fa-solid fa-lock"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat blue"><div class="stat-n" id="s-today">0</div><div class="stat-l">Today</div></div>
+      <div class="stat purple"><div class="stat-n" id="s-tom">0</div><div class="stat-l">Tomorrow</div></div>
+      <div class="stat white"><div class="stat-n" id="s-week">0</div><div class="stat-l">This Week</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on" data-f="today">Today</button>
+      <button class="tab" data-f="tomorrow">Tomorrow</button>
+      <button class="tab" data-f="upcoming">Upcoming</button>
+      <button class="tab" data-f="all">All</button>
+    </div>
+
+    <div id="list"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// Paste your Google Apps Script Web App URL here
+const API = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+// ══════════════════════════════════════════════════════════
+
+const WHATSAPP_CC = '44';
+let KEY = localStorage.getItem('sis_admin_key') || '';
+let BOOKINGS = [];
+let FILTER = 'today';
+
+const $ = id => document.getElementById(id);
+const gate = $('gate'), app = $('app');
+
+// ── Dates ────────────────────────────────────────────────
+function isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+const TODAY = isoOf(new Date());
+const TOM = (()=>{ const d=new Date(); d.setDate(d.getDate()+1); return isoOf(d); })();
+const WEEK_END = (()=>{ const d=new Date(); d.setDate(d.getDate()+7); return isoOf(d); })();
+
+// Sort by time of day (handles "09:30 AM")
+function timeVal(t){
+  if(!t) return 0;
+  const m = String(t).match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+  if(!m) return 0;
+  let h = parseInt(m[1],10);
+  const mm = parseInt(m[2],10);
+  const ap = (m[3]||'').toUpperCase();
+  if(ap==='PM' && h!==12) h+=12;
+  if(ap==='AM' && h===12) h=0;
+  return h*60+mm;
+}
+
+// ── Login ────────────────────────────────────────────────
+$('login-btn').onclick = tryLogin;
+$('key-input').onkeydown = e => { if(e.key==='Enter') tryLogin(); };
+
+async function tryLogin(){
+  const val = $('key-input').value.trim();
+  if(!val){ $('gate-err').textContent='Enter your key'; return; }
+  $('login-btn').disabled = true;
+  $('login-btn').textContent = 'Checking…';
+  $('gate-err').textContent = '';
+
+  const ok = await load(val);
+  $('login-btn').disabled = false;
+  $('login-btn').textContent = 'Unlock';
+
+  if(ok){
+    KEY = val;
+    localStorage.setItem('sis_admin_key', val);
+    gate.classList.add('hidden');
+    app.classList.remove('hidden');
+    render();
+  } else {
+    $('gate-err').textContent = 'Wrong key — try again';
+    $('key-input').value = '';
+  }
+}
+
+$('logout-btn').onclick = () => {
+  localStorage.removeItem('sis_admin_key');
+  location.reload();
+};
+
+// ── Fetch ────────────────────────────────────────────────
+async function load(key){
+  try{
+    const r = await fetch(API + '?key=' + encodeURIComponent(key) + '&t=' + Date.now());
+    const d = await r.json();
+    if(!d.ok) return false;
+    BOOKINGS = (d.bookings||[]).sort((a,b)=>{
+      if(a.iso !== b.iso) return (a.iso||'').localeCompare(b.iso||'');
+      return timeVal(a.time) - timeVal(b.time);
+    });
+    return true;
+  }catch(e){ console.warn(e); return false; }
+}
+
+$('refresh-btn').onclick = async () => {
+  const ic = $('refresh-btn').querySelector('i');
+  ic.classList.add('spin');
+  $('list').innerHTML = '<div class="skel"></div><div class="skel"></div>';
+  await load(KEY);
+  ic.classList.remove('spin');
+  render();
+};
+
+// ── Tabs ─────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    FILTER = t.dataset.f;
+    render();
+  };
+});
+
+// ── Actions ──────────────────────────────────────────────
+async function setStatus(row, value){
+  await fetch(API+'?key='+encodeURIComponent(KEY)+'&action=status&row='+row+'&value='+encodeURIComponent(value));
+  const b = BOOKINGS.find(x=>x.row===row);
+  if(b) b.status = value;
+  render();
+}
+
+async function del(row){
+  if(!confirm('Delete this booking?')) return;
+  await fetch(API+'?key='+encodeURIComponent(KEY)+'&action=delete&row='+row);
+  await load(KEY);
+  render();
+}
+
+function waLink(phone, name, date, time){
+  let p = String(phone||'').replace(/\D/g,'');
+  if(p.startsWith('0')) p = WHATSAPP_CC + p.slice(1);
+  const msg = `Hi ${name}, this is Sis Barber Shop confirming your appointment on ${date} at ${time}. See you soon!`;
+  return 'https://wa.me/'+p+'?text='+encodeURIComponent(msg);
+}
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ── Render ───────────────────────────────────────────────
+function render(){
+  // stats
+  $('s-today').textContent = BOOKINGS.filter(b=>b.iso===TODAY).length;
+  $('s-tom').textContent   = BOOKINGS.filter(b=>b.iso===TOM).length;
+  $('s-week').textContent  = BOOKINGS.filter(b=>b.iso>=TODAY && b.iso<=WEEK_END).length;
+
+  let rows = BOOKINGS;
+  if(FILTER==='today')    rows = BOOKINGS.filter(b=>b.iso===TODAY);
+  if(FILTER==='tomorrow') rows = BOOKINGS.filter(b=>b.iso===TOM);
+  if(FILTER==='upcoming') rows = BOOKINGS.filter(b=>b.iso>=TODAY);
+  if(FILTER==='all')      rows = [...BOOKINGS].reverse();
+
+  const list = $('list');
+
+  if(!rows.length){
+    list.innerHTML = `<div class="empty"><i class="fa-regular fa-calendar"></i><p>No bookings ${FILTER==='today'?'today':FILTER==='tomorrow'?'tomorrow':'yet'}</p></div>`;
+    return;
+  }
+
+  let html = '', lastDay = null;
+  rows.forEach(b => {
+    // day separator when showing multiple days
+    if((FILTER==='upcoming'||FILTER==='all') && b.date !== lastDay){
+      html += `<div class="day-label">${esc(b.date)||'No date'}</div>`;
+      lastDay = b.date;
+    }
+
+    const st = b.status || 'Upcoming';
+    const pill = st==='Done' ? 'p-done' : st==='No-show' ? 'p-noshow' : 'p-up';
+    const phone = String(b.phone||'').replace(/\s/g,'');
+
+    html += `
+    <div class="card ${st!=='Upcoming'?'done':''}">
+      <div class="card-top">
+        <div>
+          <div class="c-time">${esc(b.time)}</div>
+          <div class="c-date">${esc(b.date)}</div>
+        </div>
+        <div class="pill ${pill}">${esc(st)}</div>
+      </div>
+      <div class="c-name">${esc(b.name)}</div>
+      <div class="c-meta">
+        <div class="chip b"><i class="fa-solid fa-scissors"></i>${esc(b.service)}</div>
+        <div class="chip p"><i class="fa-solid fa-user"></i>${esc(b.barber)}</div>
+        ${b.email?`<div class="chip"><i class="fa-solid fa-envelope"></i>${esc(b.email)}</div>`:''}
+      </div>
+      <div class="c-actions">
+        <a class="act call" href="tel:${esc(phone)}"><i class="fa-solid fa-phone"></i>Call</a>
+        <a class="act wa" href="${esc(waLink(b.phone,b.name,b.date,b.time))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>
+        ${st==='Upcoming'
+          ? `<button class="act ok" onclick="setStatus(${b.row},'Done')"><i class="fa-solid fa-check"></i>Done</button>`
+          : `<button class="act" onclick="setStatus(${b.row},'Upcoming')"><i class="fa-solid fa-rotate-left"></i>Undo</button>`}
+        <button class="act del" onclick="del(${b.row})"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>`;
+  });
+
+  list.innerHTML = html;
+}
+
+// ── Boot ─────────────────────────────────────────────────
+(async () => {
+  if(KEY){
+    gate.classList.add('hidden');
+    app.classList.remove('hidden');
+    $('list').innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+    const ok = await load(KEY);
+    if(!ok){
+      localStorage.removeItem('sis_admin_key');
+      app.classList.add('hidden');
+      gate.classList.remove('hidden');
+      return;
+    }
+    render();
+  }
+})();
+</script>
+</body>
+</html>
