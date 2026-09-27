@@ -95,6 +95,158 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* ══════════════════════════════════════════════════════════
+           MEET THE TEAM — barber photo cards
+           Written as plain CSS rather than utility classes so the
+           framing is deterministic: fixed aspect ratio, object-fit
+           cover, and a per-barber focal point. Collapses 3 → 2 → 1
+           columns and never lets a portrait stretch or crop a face.
+           ══════════════════════════════════════════════════════════ */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 28px;
+            align-items: stretch;
+        }
+        @media (max-width: 900px) { .team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; } }
+        @media (max-width: 560px) { .team-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; max-width: 380px; margin-inline: auto; } }
+
+        .barber-card {
+            display: flex;
+            flex-direction: column;
+            background: #0D0D0D;
+            border: 1px solid #1f1f23;
+            border-radius: 2px;
+            overflow: hidden;
+            text-align: left;
+            transition: border-color .35s ease, transform .35s ease;
+        }
+        .barber-card:hover { border-color: #3f3f46; transform: translateY(-4px); }
+
+        .barber-photo {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            overflow: hidden;
+            background: #18181b;
+        }
+        /* Fallback for browsers without aspect-ratio support */
+        @supports not (aspect-ratio: 4 / 5) {
+            .barber-photo { height: 0; padding-bottom: 125%; }
+            .barber-photo picture { position: absolute; inset: 0; }
+        }
+        .barber-photo img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 50% 22%;   /* faces sit high in these frames */
+            filter: grayscale(100%) contrast(1.05);
+            transition: filter .45s ease, transform .6s ease;
+        }
+        .barber-card:hover .barber-photo img { filter: grayscale(0%) contrast(1); transform: scale(1.04); }
+
+        .barber-photo::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.15) 45%, transparent 75%);
+            pointer-events: none;
+        }
+
+        .barber-badge {
+            position: absolute;
+            top: 14px; left: 14px;
+            z-index: 2;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            padding: 6px 11px;
+            background: rgba(0,0,0,.55);
+            border: 1px solid rgba(255,255,255,.18);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        .barber-meta { padding: 20px 20px 24px; flex: 1; }
+        .barber-meta h3 {
+            font-size: 22px; font-weight: 900; color: #fff;
+            text-transform: uppercase; letter-spacing: 2px; line-height: 1.1;
+        }
+        .barber-role {
+            font-size: 10px; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; margin-top: 6px;
+            background: linear-gradient(90deg, #3B82F6, #A855F7);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; color: #A855F7;
+        }
+        .barber-status {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; color: #34d399; margin-top: 12px;
+        }
+        .barber-status .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #34d399; box-shadow: 0 0 8px #34d399; flex-shrink: 0;
+        }
+        .barber-bio {
+            font-size: 13px; line-height: 1.7; color: #a1a1aa;
+            font-weight: 300; margin-top: 14px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .barber-card, .barber-photo img { transition: none; }
+            .barber-card:hover { transform: none; }
+            .barber-card:hover .barber-photo img { transform: none; }
+        }
+
+        /* ── Barber picker inside the booking form ── */
+        .barber-pick {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .barber-pick-card {
+            border: 1px solid #27272a;
+            background: rgba(24,24,27,.4);
+            padding: 0 0 10px;
+            text-align: center;
+            overflow: hidden;
+            transition: border-color .25s ease, background-color .25s ease;
+        }
+        .barber-pick-card img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            height: auto;
+            object-fit: cover;
+            object-position: 50% 18%;
+            filter: grayscale(100%);
+            transition: filter .3s ease;
+            margin-bottom: 9px;
+        }
+        @supports not (aspect-ratio: 1 / 1) {
+            .barber-pick-card img { height: 88px; }
+        }
+        .barber-pick-name {
+            font-size: 11px; font-weight: 900; letter-spacing: 2px;
+            text-transform: uppercase; color: #fff;
+        }
+        .barber-pick-status {
+            font-size: 9px; color: #10b981; margin-top: 2px;
+        }
+        .group:hover .barber-pick-card { border-color: #71717a; }
+        .peer:checked + .barber-pick-card {
+            border-color: #fff;
+            background: #fff;
+        }
+        .peer:checked + .barber-pick-card .barber-pick-name { color: #000; }
+        .peer:checked + .barber-pick-card .barber-pick-status { color: #047857; }
+        .peer:checked + .barber-pick-card img { filter: grayscale(0%); }
+        .peer:focus-visible + .barber-pick-card { outline: 2px solid #3B82F6; outline-offset: 2px; }
+
         select {
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -829,257 +981,61 @@
                     <p class="text-zinc-500 text-xs uppercase tracking-widest font-semibold mt-4">Choose your barber when booking</p>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-6">
+                <div class="team-grid">
 
-                    <!-- SIS — available -->
-                    <div class="space-y-4 group">
-                        <div class="relative w-24 h-24 mx-auto">
-                            <div class="w-full h-full rounded-full border-2 border-zinc-700 group-hover:border-blue-500 transition duration-300 overflow-hidden bg-zinc-900">
-                                <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                                    <!-- bg -->
-                                    <circle cx="48" cy="48" r="48" fill="#18181b"/>
-                                    <!-- body / shirt -->
-                                    <rect x="22" y="68" width="52" height="28" rx="8" fill="#3B82F6"/>
-                                    <!-- collar -->
-                                    <polygon points="48,72 40,68 56,68" fill="#1d4ed8"/>
-                                    <!-- neck -->
-                                    <rect x="42" y="60" width="12" height="12" rx="3" fill="#8B6914"/>
-                                    <!-- head -->
-                                    <ellipse cx="48" cy="48" rx="20" ry="22" fill="#A0722A"/>
-                                    <!-- hair — tight fade top -->
-                                    <path d="M28,42 Q30,24 48,22 Q66,24 68,42 Q62,28 48,27 Q34,28 28,42Z" fill="#1a1a1a"/>
-                                    <!-- ears -->
-                                    <ellipse cx="28" cy="50" rx="3.5" ry="4.5" fill="#8B6914"/>
-                                    <ellipse cx="68" cy="50" rx="3.5" ry="4.5" fill="#8B6914"/>
-                                    <!-- eyes -->
-                                    <ellipse cx="41" cy="48" rx="3.5" ry="4" fill="white"/>
-                                    <ellipse cx="55" cy="48" rx="3.5" ry="4" fill="white"/>
-                                    <circle cx="42" cy="49" r="2.2" fill="#1a1a1a"/>
-                                    <circle cx="56" cy="49" r="2.2" fill="#1a1a1a"/>
-                                    <circle cx="42.8" cy="48.2" r="0.8" fill="white"/>
-                                    <circle cx="56.8" cy="48.2" r="0.8" fill="white"/>
-                                    <!-- eyebrows -->
-                                    <path d="M38,44 Q41,42 44,43.5" stroke="#1a1a1a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-                                    <path d="M52,43.5 Q55,42 58,44" stroke="#1a1a1a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-                                    <!-- nose -->
-                                    <ellipse cx="48" cy="54" rx="2" ry="1.2" fill="#7a5510"/>
-                                    <!-- smile -->
-                                    <path d="M43,58 Q48,62 53,58" stroke="#7a5510" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                                    <!-- mini scissors badge -->
-                                    <circle cx="72" cy="24" r="9" fill="#3B82F6"/>
-                                    <text x="72" y="28" text-anchor="middle" font-size="10" fill="white">✂</text>
-                                </svg>
-                            </div>
+                    <!-- SIS -->
+                    <article class="barber-card">
+                        <div class="barber-photo">
+                            <picture>
+                                <source srcset="assets/images/barbers/sis.webp" type="image/webp">
+                                <img src="assets/images/barbers/sis.jpg" alt="Sis, lead barber at Sis Barber Shop in Walsall"
+                                     width="900" height="1125" loading="lazy" decoding="async">
+                            </picture>
+                            <span class="barber-badge">Lead Barber</span>
                         </div>
-                        <div>
-                            <h3 class="text-base font-black uppercase tracking-widest text-white">Sis</h3>
-                            <p class="text-[9px] text-blue-400 uppercase tracking-widest font-bold mb-1">Lead Barber</p>
-                            <p class="text-[8px] text-emerald-400 uppercase tracking-widest font-bold mb-2">● Available</p>
-                            <p class="text-zinc-400 text-xs font-light leading-relaxed px-2">Skin fades and sharp line-ups.</p>
+                        <div class="barber-meta">
+                            <h3>Sis</h3>
+                            <p class="barber-role">Owner &middot; Lead Barber</p>
+                            <p class="barber-status"><span class="dot"></span>Available</p>
+                            <p class="barber-bio">Skin fades, beard work and full grooming. Founded the shop.</p>
                         </div>
-                    </div>
+                    </article>
 
-                    <!-- TEDDY — available -->
-                    <div class="space-y-4 group">
-                        <div class="relative w-24 h-24 mx-auto">
-                            <div class="w-full h-full rounded-full border-2 border-zinc-700 group-hover:border-purple-500 transition duration-300 overflow-hidden bg-zinc-900">
-                                <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                                    <circle cx="48" cy="48" r="48" fill="#18181b"/>
-                                    <!-- body -->
-                                    <rect x="22" y="68" width="52" height="28" rx="8" fill="#A855F7"/>
-                                    <polygon points="48,72 40,68 56,68" fill="#7e22ce"/>
-                                    <!-- neck -->
-                                    <rect x="42" y="60" width="12" height="12" rx="3" fill="#6B4F2A"/>
-                                    <!-- head -->
-                                    <ellipse cx="48" cy="47" rx="21" ry="23" fill="#7B5A2A"/>
-                                    <!-- hair — curly top -->
-                                    <path d="M27,44 Q26,22 48,20 Q70,22 69,44" fill="#0f0f0f"/>
-                                    <circle cx="34" cy="30" r="5" fill="#0f0f0f"/>
-                                    <circle cx="42" cy="25" r="5.5" fill="#0f0f0f"/>
-                                    <circle cx="51" cy="23" r="5" fill="#0f0f0f"/>
-                                    <circle cx="60" cy="26" r="5" fill="#0f0f0f"/>
-                                    <!-- ears -->
-                                    <ellipse cx="27" cy="49" rx="3.5" ry="4.5" fill="#7B5A2A"/>
-                                    <ellipse cx="69" cy="49" rx="3.5" ry="4.5" fill="#7B5A2A"/>
-                                    <!-- beard -->
-                                    <path d="M34,57 Q36,68 48,70 Q60,68 62,57 Q56,62 48,63 Q40,62 34,57Z" fill="#0f0f0f"/>
-                                    <!-- moustache -->
-                                    <path d="M42,55 Q48,58 54,55" stroke="#0f0f0f" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-                                    <!-- eyes -->
-                                    <ellipse cx="41" cy="47" rx="3.5" ry="4" fill="white"/>
-                                    <ellipse cx="55" cy="47" rx="3.5" ry="4" fill="white"/>
-                                    <circle cx="42" cy="48" r="2.2" fill="#1a1a1a"/>
-                                    <circle cx="56" cy="48" r="2.2" fill="#1a1a1a"/>
-                                    <circle cx="42.8" cy="47.2" r="0.8" fill="white"/>
-                                    <circle cx="56.8" cy="47.2" r="0.8" fill="white"/>
-                                    <!-- eyebrows thick -->
-                                    <path d="M37.5,43 Q41,41 44,42.5" stroke="#0f0f0f" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-                                    <path d="M52,42.5 Q55,41 58.5,43" stroke="#0f0f0f" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-                                    <!-- nose -->
-                                    <ellipse cx="48" cy="53" rx="2.2" ry="1.3" fill="#5a3e1a"/>
-                                    <!-- badge -->
-                                    <circle cx="72" cy="24" r="9" fill="#A855F7"/>
-                                    <text x="72" y="28" text-anchor="middle" font-size="10" fill="white">✂</text>
-                                </svg>
-                            </div>
+                    <!-- TEDDY -->
+                    <article class="barber-card">
+                        <div class="barber-photo">
+                            <picture>
+                                <source srcset="assets/images/barbers/teddy.webp" type="image/webp">
+                                <img src="assets/images/barbers/teddy.jpg" alt="Teddy, barber at Sis Barber Shop in Walsall"
+                                     width="900" height="1125" loading="lazy" decoding="async">
+                            </picture>
+                            <span class="barber-badge">Barber</span>
                         </div>
-                        <div>
-                            <h3 class="text-base font-black uppercase tracking-widest text-white">Teddy</h3>
-                            <p class="text-[9px] text-purple-400 uppercase tracking-widest font-bold mb-1">Senior Stylist</p>
-                            <p class="text-[8px] text-emerald-400 uppercase tracking-widest font-bold mb-2">● Available</p>
-                            <p class="text-zinc-400 text-xs font-light leading-relaxed px-2">Beards, shaves, and classic cuts.</p>
+                        <div class="barber-meta">
+                            <h3>Teddy</h3>
+                            <p class="barber-role">Senior Stylist</p>
+                            <p class="barber-status"><span class="dot"></span>Available</p>
+                            <p class="barber-bio">Beards, shaves and classic cuts.</p>
                         </div>
-                    </div>
+                    </article>
 
-                    <!-- NATHAN — not currently available -->
-                    <div class="space-y-4 opacity-40 pointer-events-none select-none">
-                        <div class="relative w-24 h-24 mx-auto">
-                            <div class="w-full h-full rounded-full border-2 border-zinc-800 overflow-hidden bg-zinc-900">
-                                <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                                    <circle cx="48" cy="48" r="48" fill="#18181b"/>
-                                    <!-- body -->
-                                    <rect x="22" y="68" width="52" height="28" rx="8" fill="#10b981"/>
-                                    <polygon points="48,72 40,68 56,68" fill="#047857"/>
-                                    <!-- neck -->
-                                    <rect x="42" y="60" width="12" height="12" rx="3" fill="#C49A4A"/>
-                                    <!-- head -->
-                                    <ellipse cx="48" cy="48" rx="20" ry="22" fill="#D4A84B"/>
-                                    <!-- spiky hair -->
-                                    <polygon points="48,18 44,28 52,28" fill="#1a1a1a"/>
-                                    <polygon points="40,20 36,30 44,30" fill="#1a1a1a"/>
-                                    <polygon points="56,20 52,30 60,30" fill="#1a1a1a"/>
-                                    <polygon points="34,24 30,34 38,32" fill="#1a1a1a"/>
-                                    <polygon points="62,24 58,32 66,34" fill="#1a1a1a"/>
-                                    <path d="M28,44 Q30,28 48,26 Q66,28 68,44 Q64,32 48,31 Q32,32 28,44Z" fill="#1a1a1a"/>
-                                    <!-- ears -->
-                                    <ellipse cx="28" cy="50" rx="3.5" ry="4.5" fill="#D4A84B"/>
-                                    <ellipse cx="68" cy="50" rx="3.5" ry="4.5" fill="#D4A84B"/>
-                                    <!-- eyes — big anime style -->
-                                    <ellipse cx="41" cy="48" rx="4" ry="4.5" fill="white"/>
-                                    <ellipse cx="55" cy="48" rx="4" ry="4.5" fill="white"/>
-                                    <circle cx="42" cy="49" r="2.8" fill="#2d4a1e"/>
-                                    <circle cx="56" cy="49" r="2.8" fill="#2d4a1e"/>
-                                    <circle cx="43" cy="48" r="1" fill="white"/>
-                                    <circle cx="57" cy="48" r="1" fill="white"/>
-                                    <!-- eyebrows arched -->
-                                    <path d="M37,43.5 Q41,41 45,43" stroke="#1a1a1a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-                                    <path d="M51,43 Q55,41 59,43.5" stroke="#1a1a1a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-                                    <!-- nose -->
-                                    <circle cx="48" cy="54" r="1.3" fill="#b8912a"/>
-                                    <!-- grin -->
-                                    <path d="M42,58 Q48,63 54,58" stroke="#b8912a" stroke-width="1.5" fill="rgba(255,255,255,0.2)" stroke-linecap="round"/>
-                                    <!-- badge -->
-                                    <circle cx="72" cy="24" r="9" fill="#10b981"/>
-                                    <text x="72" y="28" text-anchor="middle" font-size="10" fill="white">✂</text>
-                                </svg>
-                            </div>
+                    <!-- JAY -->
+                    <article class="barber-card">
+                        <div class="barber-photo">
+                            <picture>
+                                <source srcset="assets/images/barbers/jay.webp" type="image/webp">
+                                <img src="assets/images/barbers/jay.jpg" alt="Jay, barber at Sis Barber Shop in Walsall"
+                                     width="900" height="1125" loading="lazy" decoding="async">
+                            </picture>
+                            <span class="barber-badge">Barber</span>
                         </div>
-                        <div>
-                            <h3 class="text-base font-black uppercase tracking-widest text-zinc-500">Nathan</h3>
-                            <p class="text-[9px] text-zinc-600 uppercase tracking-widest font-bold mb-1">Texture Expert</p>
-                            <p class="text-[8px] text-zinc-600 uppercase tracking-widest font-bold mb-2">● Not Available</p>
-                            <p class="text-zinc-600 text-xs font-light leading-relaxed px-2">Texture, crops, and modern styles.</p>
+                        <div class="barber-meta">
+                            <h3>Jay</h3>
+                            <p class="barber-role">Barber</p>
+                            <p class="barber-status"><span class="dot"></span>Available</p>
+                            <p class="barber-bio">Fades, tapers and precision line-ups.</p>
                         </div>
-                    </div>
-
-                    <!-- YONAS — not currently available -->
-                    <div class="space-y-4 opacity-40 pointer-events-none select-none">
-                        <div class="relative w-24 h-24 mx-auto">
-                            <div class="w-full h-full rounded-full border-2 border-zinc-800 overflow-hidden bg-zinc-900">
-                                <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                                    <circle cx="48" cy="48" r="48" fill="#18181b"/>
-                                    <!-- body -->
-                                    <rect x="22" y="68" width="52" height="28" rx="8" fill="#f59e0b"/>
-                                    <polygon points="48,72 40,68 56,68" fill="#b45309"/>
-                                    <!-- neck -->
-                                    <rect x="42" y="60" width="12" height="12" rx="3" fill="#8B6914"/>
-                                    <!-- head -->
-                                    <ellipse cx="48" cy="48" rx="20" ry="22" fill="#9B7320"/>
-                                    <!-- hair — low cut, clean -->
-                                    <path d="M28,44 Q28,24 48,22 Q68,24 68,44 Q64,30 48,29 Q32,30 28,44Z" fill="#0d0d0d"/>
-                                    <!-- ears -->
-                                    <ellipse cx="28" cy="50" rx="3.5" ry="4.5" fill="#9B7320"/>
-                                    <ellipse cx="68" cy="50" rx="3.5" ry="4.5" fill="#9B7320"/>
-                                    <!-- glasses frames -->
-                                    <rect x="35" y="44" width="10" height="8" rx="3" fill="none" stroke="#f59e0b" stroke-width="1.8"/>
-                                    <rect x="51" y="44" width="10" height="8" rx="3" fill="none" stroke="#f59e0b" stroke-width="1.8"/>
-                                    <line x1="45" y1="48" x2="51" y2="48" stroke="#f59e0b" stroke-width="1.5"/>
-                                    <line x1="35" y1="48" x2="31" y2="47" stroke="#f59e0b" stroke-width="1.5"/>
-                                    <line x1="61" y1="48" x2="65" y2="47" stroke="#f59e0b" stroke-width="1.5"/>
-                                    <!-- eyes behind glasses -->
-                                    <circle cx="40" cy="48" r="1.8" fill="#1a1a1a"/>
-                                    <circle cx="56" cy="48" r="1.8" fill="#1a1a1a"/>
-                                    <circle cx="40.6" cy="47.4" r="0.7" fill="white"/>
-                                    <circle cx="56.6" cy="47.4" r="0.7" fill="white"/>
-                                    <!-- eyebrows -->
-                                    <path d="M36,43 Q40,41.5 44,42.5" stroke="#0d0d0d" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-                                    <path d="M52,42.5 Q56,41.5 60,43" stroke="#0d0d0d" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-                                    <!-- nose -->
-                                    <ellipse cx="48" cy="54" rx="1.8" ry="1.1" fill="#7a5510"/>
-                                    <!-- neutral focused expression -->
-                                    <path d="M44,58.5 Q48,60 52,58.5" stroke="#7a5510" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-                                    <!-- badge -->
-                                    <circle cx="72" cy="24" r="9" fill="#f59e0b"/>
-                                    <text x="72" y="28" text-anchor="middle" font-size="10" fill="white">✂</text>
-                                </svg>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="text-base font-black uppercase tracking-widest text-zinc-500">Yonas</h3>
-                            <p class="text-[9px] text-zinc-600 uppercase tracking-widest font-bold mb-1">Detail Specialist</p>
-                            <p class="text-[8px] text-zinc-600 uppercase tracking-widest font-bold mb-2">● Not Available</p>
-                            <p class="text-zinc-600 text-xs font-light leading-relaxed px-2">Tapers, blends, and fine detail.</p>
-                        </div>
-                    </div>
-
-                    <!-- DAVE — not currently available -->
-                    <div class="space-y-4 opacity-40 pointer-events-none select-none">
-                        <div class="relative w-24 h-24 mx-auto">
-                            <div class="w-full h-full rounded-full border-2 border-zinc-800 overflow-hidden bg-zinc-900">
-                                <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                                    <circle cx="48" cy="48" r="48" fill="#18181b"/>
-                                    <!-- body -->
-                                    <rect x="22" y="68" width="52" height="28" rx="8" fill="#ef4444"/>
-                                    <polygon points="48,72 40,68 56,68" fill="#b91c1c"/>
-                                    <!-- neck -->
-                                    <rect x="42" y="60" width="12" height="12" rx="3" fill="#C49A4A"/>
-                                    <!-- head -->
-                                    <ellipse cx="48" cy="49" rx="20" ry="21" fill="#D4A84B"/>
-                                    <!-- backwards cap -->
-                                    <ellipse cx="48" cy="33" rx="22" ry="7" fill="#1a1a1a"/>
-                                    <rect x="26" y="28" width="44" height="9" rx="4" fill="#1a1a1a"/>
-                                    <!-- cap brim at back -->
-                                    <ellipse cx="48" cy="28" rx="14" ry="4" fill="#0d0d0d"/>
-                                    <!-- ears -->
-                                    <ellipse cx="28" cy="51" rx="3.5" ry="4.5" fill="#D4A84B"/>
-                                    <ellipse cx="68" cy="51" rx="3.5" ry="4.5" fill="#D4A84B"/>
-                                    <!-- eyes -->
-                                    <ellipse cx="41" cy="49" rx="3.5" ry="4" fill="white"/>
-                                    <ellipse cx="55" cy="49" rx="3.5" ry="4" fill="white"/>
-                                    <circle cx="42" cy="50" r="2.2" fill="#1a1a1a"/>
-                                    <circle cx="56" cy="50" r="2.2" fill="#1a1a1a"/>
-                                    <circle cx="42.8" cy="49.2" r="0.8" fill="white"/>
-                                    <circle cx="56.8" cy="49.2" r="0.8" fill="white"/>
-                                    <!-- eyebrows confident -->
-                                    <path d="M38,44.5 Q41,43 44,44" stroke="#1a1a1a" stroke-width="2" fill="none" stroke-linecap="round"/>
-                                    <path d="M52,44 Q55,43 58,44.5" stroke="#1a1a1a" stroke-width="2" fill="none" stroke-linecap="round"/>
-                                    <!-- nose -->
-                                    <ellipse cx="48" cy="55" rx="2" ry="1.2" fill="#b8912a"/>
-                                    <!-- big grin showing teeth -->
-                                    <path d="M41,59 Q48,65 55,59" stroke="#b8912a" stroke-width="1.5" fill="rgba(255,255,255,0.85)" stroke-linecap="round"/>
-                                    <!-- badge -->
-                                    <circle cx="72" cy="24" r="9" fill="#ef4444"/>
-                                    <text x="72" y="28" text-anchor="middle" font-size="10" fill="white">✂</text>
-                                </svg>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="text-base font-black uppercase tracking-widest text-zinc-500">Dave</h3>
-                            <p class="text-[9px] text-zinc-600 uppercase tracking-widest font-bold mb-1">Fade Technician</p>
-                            <p class="text-[8px] text-zinc-600 uppercase tracking-widest font-bold mb-2">● Not Available</p>
-                            <p class="text-zinc-600 text-xs font-light leading-relaxed px-2">Fast fades and crisp finishes.</p>
-                        </div>
-                    </div>
+                    </article>
 
                 </div>
             </div>
@@ -1235,17 +1191,35 @@
 
                             <!-- Specific barber picker — hidden until "Specific Barber" chosen -->
                             <div id="specific-barber-panel" class="hidden space-y-3 pt-1">
-                                <div class="grid grid-cols-2 gap-2">
+                                <div class="barber-pick">
                                     <label class="cursor-pointer group"><input type="radio" name="barber" value="Sis" class="peer sr-only" onchange="onBarberRadioChange()">
-                                        <div class="border border-zinc-800 bg-zinc-900/30 p-3 text-center peer-checked:border-white peer-checked:bg-white peer-checked:text-black group-hover:border-zinc-500 transition duration-300">
-                                            <p class="text-[11px] font-black uppercase tracking-widest">Sis</p>
-                                            <p class="text-[9px] text-emerald-500 peer-checked:text-emerald-700 mt-0.5">● Available</p>
+                                        <div class="barber-pick-card">
+                                            <picture>
+                                                <source srcset="assets/images/barbers/sis.webp" type="image/webp">
+                                                <img src="assets/images/barbers/sis.jpg" alt="" width="900" height="1125" loading="lazy" decoding="async">
+                                            </picture>
+                                            <p class="barber-pick-name">Sis</p>
+                                            <p class="barber-pick-status">● Available</p>
                                         </div>
                                     </label>
                                     <label class="cursor-pointer group"><input type="radio" name="barber" value="Teddy" class="peer sr-only" onchange="onBarberRadioChange()">
-                                        <div class="border border-zinc-800 bg-zinc-900/30 p-3 text-center peer-checked:border-white peer-checked:bg-white peer-checked:text-black group-hover:border-zinc-500 transition duration-300">
-                                            <p class="text-[11px] font-black uppercase tracking-widest">Teddy</p>
-                                            <p class="text-[9px] text-emerald-500 peer-checked:text-emerald-700 mt-0.5">● Available</p>
+                                        <div class="barber-pick-card">
+                                            <picture>
+                                                <source srcset="assets/images/barbers/teddy.webp" type="image/webp">
+                                                <img src="assets/images/barbers/teddy.jpg" alt="" width="900" height="1125" loading="lazy" decoding="async">
+                                            </picture>
+                                            <p class="barber-pick-name">Teddy</p>
+                                            <p class="barber-pick-status">● Available</p>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer group"><input type="radio" name="barber" value="Jay" class="peer sr-only" onchange="onBarberRadioChange()">
+                                        <div class="barber-pick-card">
+                                            <picture>
+                                                <source srcset="assets/images/barbers/jay.webp" type="image/webp">
+                                                <img src="assets/images/barbers/jay.jpg" alt="" width="900" height="1125" loading="lazy" decoding="async">
+                                            </picture>
+                                            <p class="barber-pick-name">Jay</p>
+                                            <p class="barber-pick-status">● Available</p>
                                         </div>
                                     </label>
                                 </div>
@@ -1612,12 +1586,13 @@
             return true;
         }
 
-        const BARBERS = ['Sis', 'Teddy'];
+        const BARBERS = ['Sis', 'Teddy', 'Jay'];
 
         // Off days per barber: 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
         const BARBER_OFF_DAYS = {
             Sis:   [],
             Teddy: [],
+            Jay:   [],
         };
 
         // Opening hours in minutes from midnight
@@ -1946,7 +1921,7 @@
             { q: ['wash','washing','machine','hair wash'],
               a: 'Yes! We have a professional washing station with a full washing machine. You can add a hair wash to any service, or book the Full Service which includes everything. 🫧' },
             { q: ['barber','team','staff','who','sis','teddy'],
-              a: 'Our team:\n\n👑 Sis — Lead Barber\n✂️ Teddy — Senior Stylist\n\nBoth available now. You can pick your barber when booking.' },
+              a: 'Our team:\n\n👑 Sis — Owner & Lead Barber\n✂️ Teddy — Senior Stylist\n✂️ Jay — Barber\n\nAll three available. You can pick your barber when booking.' },
             { q: ['walk in','walk-in','walkin','no appointment'],
               a: 'Walk-ins are welcome! Just come in and we\'ll fit you in. To guarantee your slot though, booking online is quicker.' },
             { q: ['how long','duration','time'],
