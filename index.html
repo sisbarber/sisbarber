@@ -1602,6 +1602,16 @@
             return null;
         }
 
+        // Mirrors the server check. Requires a real TLD, which the browser
+        // built-in email validation does not.
+        function isValidEmail(e) {
+            const s = String(e || '').trim();
+            if (s.length < 6 || s.length > 100) return false;
+            if (!/^[^\s@,;:<>"'\\]+@[^\s@,;:<>"'\\]+\.[A-Za-z]{2,}$/.test(s)) return false;
+            if (/\.\./.test(s)) return false;
+            return true;
+        }
+
         const BARBERS = ['Sis', 'Teddy'];
 
         // Off days per barber: 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
@@ -2135,6 +2145,18 @@
                     return;
                 }
                 document.getElementById('form-phone').classList.remove('border-red-600');
+
+                // ── Validate email ────────────────────────────────────────
+                // The browser's own type="email" check accepts "a@b" — it does
+                // not require a dot in the domain — so we check properly here.
+                if (!isValidEmail(email)) {
+                    const el = document.getElementById('form-email');
+                    el.classList.add('border-red-600');
+                    el.focus();
+                    alert('Please enter a valid email address.\n\nWe send your confirmation link there, so it needs to be one you can open.');
+                    return;
+                }
+                document.getElementById('form-email').classList.remove('border-red-600');
 
                 // Determine confirmed barber
                 let confirmedBarber = 'First Available Barber';
