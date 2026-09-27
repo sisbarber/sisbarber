@@ -10,6 +10,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Bookings · Sis Barber Shop</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════════════════════
    Mobile-first. Minimum 16px body text, 48px touch targets,
@@ -32,6 +35,24 @@ body{
   background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   font-size:17px;line-height:1.5;min-height:100vh;
+}
+/* Ge'ez script needs a touch more room and a font that carries every glyph */
+body.lang-ti,
+body.lang-ti button,
+body.lang-ti input,
+body.lang-ti select{
+  font-family:'Noto Sans Ethiopic',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+body.lang-ti{ line-height:1.7; }
+body.lang-ti .stat-l,
+body.lang-ti .label,
+body.lang-ti .day-label,
+body.lang-ti .pill,
+body.lang-ti .src{ text-transform:none; letter-spacing:0; }
+body.lang-ti .c-time{ letter-spacing:0; }
+body.lang-ti .act{ font-size:14px; }
+body.lang-ti .gate-logo{ letter-spacing:1px; }
+body{
   padding-bottom:calc(120px + env(safe-area-inset-bottom));
   -webkit-font-smoothing:antialiased;
 }
@@ -205,6 +226,7 @@ header{border-bottom:1px solid var(--line);padding:18px 0 15px;margin-bottom:20p
     <div class="wrap head-row">
       <div class="brand"><span>Sis Barber Shop</span><strong>Bookings</strong></div>
       <div class="head-actions">
+        <button class="icon-btn" id="lang-btn" aria-label="Change language" style="width:auto;padding:0 14px;font-size:14px;font-weight:700">EN</button>
         <button class="icon-btn" id="refresh-btn" aria-label="Refresh bookings"><i class="fa-solid fa-rotate-right"></i></button>
         <button class="icon-btn" id="logout-btn" aria-label="Lock dashboard"><i class="fa-solid fa-lock"></i></button>
       </div>
@@ -291,6 +313,155 @@ header{border-bottom:1px solid var(--line);padding:18px 0 15px;margin-bottom:20p
 const API = 'https://script.google.com/macros/s/AKfycbx8lKSjdcW1Z_a12EXLVGIHmBast8b4L3AYw6AkVW4fGojmAH0yIeaABazV0t5CVzIr/exec';
 // ═══════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════
+//  LANGUAGE  ·  English / ትግርኛ
+//  Admin dashboard only — the public site stays English.
+// ═══════════════════════════════════════════════════════════
+const STRINGS = {
+  en: {
+    bookings:'Bookings', shopName:'Sis Barber Shop',
+    enterKey:'Enter your access key', keyPlaceholder:'access key',
+    unlock:'Unlock', checking:'Checking…', enterKeyFirst:'Enter your key',
+    wrongKey:t('wrongKey'), connFail:'Connection failed',
+    today:'Today', tomorrow:'Tomorrow', upcoming:'Upcoming',
+    past:'Past', customers:'Customers', archive:'Archive',
+    sevenDays:'7 Days',
+    newBooking:'New Booking', customerName:'Customer name',
+    phone:'Phone', email:'Email', optional:'(optional)',
+    service:'Service', barber:'Barber', date:'Date', time:'Time',
+    anyoneAvailable:'Anyone available', confirmBooking:'Confirm Booking',
+    saving:'Saving…', emailHint:'If you add an email, the customer gets a confirmation automatically.',
+    nameRequired:'Customer name is required', phoneRequired:'Phone number is required',
+    pickTime:'Pick a time', pickDate:'Pick a date', closedThatDay:'Closed that day',
+    call:'Call', whatsapp:'WhatsApp', done:'Done', undo:'Undo',
+    restore:'Restore', deleteForever:'Delete forever',
+    statusUpcoming:'Upcoming', statusDone:'Done',
+    statusCancelled:'Cancelled', statusNoShow:'No-show', statusArchived:'Archived',
+    statusPending:'Pending',
+    regular:'Regular', phoneBooking:'Phone', noShowBadge:'no-show',
+    nothingToday:'Nothing today', nothingTomorrow:'Nothing tomorrow',
+    nothingPast:'Nothing in the past', nothingArchive:'Nothing in the archive',
+    nothingYet:'Nothing yet', noCustomers:'No customers yet',
+    completed:'Completed', takings:'Takings', spent:'Spent',
+    visitHistory:'Visit history', rebook:'Rebook',
+    usually:'Usually:', usuallyWith:'Usually with',
+    customersCount:'customer', customersCountPlural:'customers',
+    mostFrequent:'most frequent first',
+    bookingCount:'booking', bookingCountPlural:'bookings',
+    spentLabel:'spent', upcomingLower:'upcoming',
+    confirmArchive:'Move this booking to the Archive?\n\nYou can restore it later from the Archive tab.',
+    confirmDestroy:'Permanently delete this booking?\n\nThis erases it from the records and cannot be undone.',
+    movedToArchive:'Moved to Archive', restored:'Booking restored',
+    permDeleted:'Permanently deleted', couldNotUpdate:'Could not update',
+    couldNotArchive:'Could not archive', couldNotDelete:'Could not delete',
+    bookingAddedFor:'Booking added for', couldNotSave:'Could not save'
+  },
+  ti: {
+    bookings:'ቆጸራታት', shopName:'ሲስ ቤት ጸጉሪ',
+    enterKey:'መእተዊ ቁልፍኻ ኣእቱ', keyPlaceholder:'መእተዊ ቁልፊ',
+    unlock:'ክፈት', checking:'ይረጋገጽ ኣሎ…', enterKeyFirst:'ቁልፍኻ ኣእቱ',
+    wrongKey:'ቁልፊ ጌጋ እዩ — ደጊምካ ፈትን', connFail:'ርክብ ኣይተኻእለን',
+    today:'ሎሚ', tomorrow:'ጽባሕ', upcoming:'ዝመጽእ',
+    past:'ዝሓለፈ', customers:'ዓማዊል', archive:'መዝገብ',
+    sevenDays:'7 መዓልቲ',
+    newBooking:'ሓድሽ ቆጸራ', customerName:'ስም ዓሚል',
+    phone:'ስልኪ', email:'ኢመይል', optional:'(ብድላይ)',
+    service:'ኣገልግሎት', barber:'ቀምቃሚ', date:'ዕለት', time:'ሰዓት',
+    anyoneAvailable:'ዝኾነ ዘሎ', confirmBooking:'ቆጸራ ኣረጋግጽ',
+    saving:'ይቕመጥ ኣሎ…', emailHint:'ኢመይል እንተ ኣእቲኻ፡ ዓሚል ናይ ምርግጋጽ መልእኽቲ ይረክብ።',
+    nameRequired:'ስም ዓሚል የድሊ', phoneRequired:'ቁጽሪ ስልኪ የድሊ',
+    pickTime:'ሰዓት ምረጽ', pickDate:'ዕለት ምረጽ', closedThatDay:'በታ መዓልቲ ዕጹው',
+    call:'ደውል', whatsapp:'ዋትስኣፕ', done:'ተዛዚሙ', undo:'ተመለስ',
+    restore:'መልሶ', deleteForever:'ንሓዋሩ ሰርዝ',
+    statusUpcoming:'ዝመጽእ', statusDone:'ተዛዚሙ',
+    statusCancelled:'ተሰሪዙ', statusNoShow:'ኣይመጸን', statusArchived:'ተዓቚቡ',
+    statusPending:'ኣብ ምጽባይ',
+    regular:'ቀዋሚ', phoneBooking:'ብስልኪ', noShowBadge:'ኣይመጸን',
+    nothingToday:'ሎሚ ቆጸራ የለን', nothingTomorrow:'ጽባሕ ቆጸራ የለን',
+    nothingPast:'ዝሓለፈ ቆጸራ የለን', nothingArchive:'ኣብ መዝገብ ዋላ ሓደ የለን',
+    nothingYet:'ገና ዋላ ሓደ የለን', noCustomers:'ገና ዓማዊል የለዉን',
+    completed:'ተዛዚሙ', takings:'እቶት', spent:'ዝኸፈለ',
+    visitHistory:'ታሪኽ ምብጻሕ', rebook:'እንደገና ሓዝ',
+    usually:'መብዛሕትኡ ግዜ፦', usuallyWith:'መብዛሕትኡ ግዜ ምስ',
+    customersCount:'ዓሚል', customersCountPlural:'ዓማዊል',
+    mostFrequent:'ብብዝሒ ምብጻሕ ተሰሪዑ',
+    bookingCount:'ቆጸራ', bookingCountPlural:'ቆጸራታት',
+    spentLabel:'ከፊሉ', upcomingLower:'ዝመጽእ',
+    confirmArchive:'እዚ ቆጸራ ናብ መዝገብ ይኺድ?\n\nድሒርካ ካብ መዝገብ ክትመልሶ ትኽእል ኢኻ።',
+    confirmDestroy:'እዚ ቆጸራ ንሓዋሩ ይሰረዝ?\n\nካብ መዝገብ ብምሉኡ ይጠፍእ፡ ክምለስ ኣይክእልን።',
+    movedToArchive:'ናብ መዝገብ ተቐይሩ', restored:'ቆጸራ ተመሊሱ',
+    permDeleted:'ንሓዋሩ ተሰሪዙ', couldNotUpdate:'ክሕደስ ኣይከኣለን',
+    couldNotArchive:'ክዕቀብ ኣይከኣለን', couldNotDelete:'ክስረዝ ኣይከኣለን',
+    bookingAddedFor:'ቆጸራ ተወሲኹ ንዓ', couldNotSave:'ክቕመጥ ኣይከኣለን'
+  }
+};
+
+let LANG = localStorage.getItem('sis_admin_lang') || 'en';
+const t = k => (STRINGS[LANG] && STRINGS[LANG][k]) || STRINGS.en[k] || k;
+
+/** Map a booking status coming from the sheet to the current language. */
+function statusLabel(s){
+  const map = { 'Upcoming':'statusUpcoming', 'Done':'statusDone', 'Cancelled':'statusCancelled',
+                'No-show':'statusNoShow', 'Deleted':'statusArchived', 'Pending':'statusPending' };
+  return map[s] ? t(map[s]) : s;
+}
+
+function applyLang(){
+  document.body.classList.toggle('lang-ti', LANG === 'ti');
+  document.documentElement.lang = LANG === 'ti' ? 'ti' : 'en';
+
+  const set = (sel, val, prop) => {
+    const el = typeof sel === 'string' ? document.querySelector(sel) : sel;
+    if (el) el[prop || 'textContent'] = val;
+  };
+
+  set('#lang-btn', LANG === 'en' ? 'ትግ' : 'EN');
+
+  // Login screen
+  set('.gate-logo', t('shopName'));
+  set('.gate-title', t('bookings'));
+  set('.gate-sub', t('enterKey'));
+  set('#key-input', t('keyPlaceholder'), 'placeholder');
+  set('#login-btn', t('unlock'));
+
+  // Header
+  set('header .brand span', t('shopName'));
+  set('header .brand strong', t('bookings'));
+
+  // Stat labels
+  const statL = document.querySelectorAll('.stats .stat-l');
+  if (statL[0]) statL[0].textContent = t('today');
+  if (statL[1]) statL[1].textContent = t('tomorrow');
+  if (statL[2]) statL[2].textContent = t('sevenDays');
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(tab => { tab.textContent = t(tab.dataset.f); });
+
+  // FAB
+  const fab = document.getElementById('add-btn');
+  if (fab) fab.innerHTML = '<i class="fa-solid fa-plus"></i> ' + t('newBooking');
+
+  // New-booking form
+  set('#modal .sheet-title', t('newBooking'));
+  const L = document.querySelectorAll('#modal .label');
+  const keys = ['customerName','phone','email','service','barber','date','time'];
+  L.forEach((el, i) => {
+    if (!keys[i]) return;
+    el.innerHTML = t(keys[i]) + (keys[i] === 'email' ? ' <span class="opt">' + t('optional') + '</span>' : '');
+  });
+  set('#save-btn', t('confirmBooking'));
+  set('#modal .hint', t('emailHint'));
+
+  if (CFG) buildForm();
+  if (!app.classList.contains('hidden')) render();
+}
+
+document.getElementById('lang-btn').onclick = () => {
+  LANG = LANG === 'en' ? 'ti' : 'en';
+  localStorage.setItem('sis_admin_lang', LANG);
+  applyLang();
+};
+
 const WA_CC = '44';
 let KEY = localStorage.getItem('sis_admin_key') || '';
 let BOOKINGS = [], CFG = null, FILTER = 'today', LAST_ERR = '';
@@ -333,12 +504,12 @@ async function load(key){
   try{
     const r = await fetch(API+'?key='+encodeURIComponent(key)+'&t='+Date.now());
     const d = await r.json();
-    if(!d.ok){ LAST_ERR = d.error==='unauthorised' ? 'Wrong key — try again' : ('Server: '+(d.error||'?')); return false; }
+    if(!d.ok){ LAST_ERR = d.error==='unauthorised' ? t('wrongKey') : ('Server: '+(d.error||'?')); return false; }
     LAST_ERR='';
     BOOKINGS = (d.bookings||[]).sort((a,b)=>
       a.iso!==b.iso ? (a.iso||'').localeCompare(b.iso||'') : timeVal(a.time)-timeVal(b.time));
     return true;
-  }catch(e){ LAST_ERR='Connection failed — '+e.message; return false; }
+  }catch(e){ LAST_ERR=t('connFail')+' — '+e.message; return false; }
 }
 
 async function loadConfig(){
@@ -351,15 +522,15 @@ $('key-input').onkeydown = e => { if(e.key==='Enter') tryLogin(); };
 
 async function tryLogin(){
   const val = $('key-input').value.trim();
-  if(!val){ $('gate-err').textContent='Enter your key'; return; }
-  $('login-btn').disabled=true; $('login-btn').textContent='Checking…'; $('gate-err').textContent='';
+  if(!val){ $('gate-err').textContent=t('enterKeyFirst'); return; }
+  $('login-btn').disabled=true; $('login-btn').textContent=t('checking'); $('gate-err').textContent='';
   const ok = await load(val);
-  $('login-btn').disabled=false; $('login-btn').textContent='Unlock';
+  $('login-btn').disabled=false; $('login-btn').textContent=t('unlock');
   if(ok){
     KEY=val; localStorage.setItem('sis_admin_key',val);
     gate.classList.add('hidden'); app.classList.remove('hidden');
-    render(); loadConfig();
-  } else $('gate-err').textContent = LAST_ERR || 'Wrong key — try again';
+    applyLang(); render(); loadConfig();
+  } else $('gate-err').textContent = LAST_ERR || t('wrongKey');
 }
 
 $('logout-btn').onclick = () => { localStorage.removeItem('sis_admin_key'); location.reload(); };
@@ -380,33 +551,33 @@ async function setStatus(row, value){
   try{
     const d = await api({action:'status',row:row,value:value});
     if(!d.ok) throw new Error(d.error||'failed');
-  }catch(e){ if(b) b.status=prev; render(); toast('Could not update — '+e.message,false); }
+  }catch(e){ if(b) b.status=prev; render(); toast(t('couldNotUpdate')+' — '+e.message,false); }
 }
 
 async function del(row){
-  if(!confirm('Move this booking to the Archive?\n\nYou can restore it later from the Archive tab.')) return;
+  if(!confirm(t('confirmArchive'))) return;
   try{
     const d = await api({action:'delete',row:row});
     if(!d.ok) throw new Error(d.error||'failed');
-    await load(KEY); render(); toast('Moved to Archive');
-  }catch(e){ toast('Could not archive — '+e.message,false); }
+    await load(KEY); render(); toast(t('movedToArchive'));
+  }catch(e){ toast(t('couldNotArchive')+' — '+e.message,false); }
 }
 
 async function restore(row){
   try{
     const d = await api({action:'restore',row:row});
     if(!d.ok) throw new Error(d.error||'failed');
-    await load(KEY); render(); toast('Booking restored');
+    await load(KEY); render(); toast(t('restored'));
   }catch(e){ toast('Could not restore — '+e.message,false); }
 }
 
 async function destroy(row){
-  if(!confirm('Permanently delete this booking?\n\nThis erases it from the records and cannot be undone.')) return;
+  if(!confirm(t('confirmDestroy'))) return;
   try{
     const d = await api({action:'destroy',row:row});
     if(!d.ok) throw new Error(d.error||'failed');
-    await load(KEY); render(); toast('Permanently deleted');
-  }catch(e){ toast('Could not delete — '+e.message,false); }
+    await load(KEY); render(); toast(t('permDeleted'));
+  }catch(e){ toast(t('couldNotDelete')+' — '+e.message,false); }
 }
 
 /* ── Customer intelligence ───────────────────────────────── */
@@ -465,25 +636,25 @@ function openCustomer(key){
     `<div class="stat"><div class="stat-n" style="color:${col};font-size:28px">${n}</div><div class="stat-l">${l}</div></div>`;
 
   let html = `<div class="stats" style="margin-bottom:20px">
-      ${stat(c.count,'Bookings','var(--blue)')}
-      ${stat(c.doneCount,'Completed','var(--purple)')}
-      ${stat('£'+c.total,'Spent','var(--text)')}
+      ${stat(c.count,t('bookings'),'var(--blue)')}
+      ${stat(c.doneCount,t('completed'),'var(--purple)')}
+      ${stat('£'+c.total,t('spent'),'var(--text)')}
     </div>`;
 
   html += `<div class="c-meta" style="margin-bottom:20px">
       <div class="chip e"><i class="fa-solid fa-phone"></i><span>${esc(c.phone)}</span></div>
       ${c.email?`<div class="chip e"><i class="fa-solid fa-envelope"></i><span>${esc(c.email)}</span></div>`:''}
-      ${c.usualService?`<div class="chip b"><i class="fa-solid fa-scissors"></i><span>Usually: ${esc(c.usualService)}</span></div>`:''}
-      ${c.usualBarber?`<div class="chip p"><i class="fa-solid fa-user"></i><span>Usually with ${esc(c.usualBarber)}</span></div>`:''}
+      ${c.usualService?`<div class="chip b"><i class="fa-solid fa-scissors"></i><span>${t('usually')} ${esc(c.usualService)}</span></div>`:''}
+      ${c.usualBarber?`<div class="chip p"><i class="fa-solid fa-user"></i><span>${t('usuallyWith')} ${esc(c.usualBarber)}</span></div>`:''}
     </div>`;
 
   html += `<div style="display:flex;gap:9px;margin-bottom:22px">
-      <a class="act call" href="tel:${esc(String(c.phone).replace(/\s/g,''))}"><i class="fa-solid fa-phone"></i>Call</a>
-      <a class="act wa" href="${esc(waLink(c.phone,c.name,'',''))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>
-      <button class="act ok" onclick="rebook('${c.key}')"><i class="fa-solid fa-rotate-right"></i>Rebook</button>
+      <a class="act call" href="tel:${esc(String(c.phone).replace(/\s/g,''))}"><i class="fa-solid fa-phone"></i>${t('call')}</a>
+      <a class="act wa" href="${esc(waLink(c.phone,c.name,'',''))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>${t('whatsapp')}</a>
+      <button class="act ok" onclick="rebook('${c.key}')"><i class="fa-solid fa-rotate-right"></i>${t('rebook')}</button>
     </div>`;
 
-  html += `<div class="day-label">Visit history</div>`;
+  html += `<div class="day-label">${t('visitHistory')}</div>`;
   c.visits.forEach(v => {
     const st = v.status||'Upcoming';
     const pill = st==='Done'?'p-done':st==='Cancelled'||st==='No-show'?'p-cancelled':'p-up';
@@ -494,7 +665,7 @@ function openCustomer(key){
             <div style="font-size:14px;color:var(--text2);margin-top:4px">${esc(v.time)} · ${esc(v.service)} · ${esc(v.barber)}</div>
           </div>
           <div style="text-align:right;flex-shrink:0">
-            <div class="pill ${pill}">${esc(st)}</div>
+            <div class="pill ${pill}">${esc(statusLabel(st))}</div>
             <div style="font-size:15px;color:var(--muted);margin-top:6px">£${priceOf(v.service)}</div>
           </div>
         </div>
@@ -542,19 +713,19 @@ function render(){
   // ── Customers view ──
   if(FILTER==='customers'){
     const cs = buildCustomers();
-    if(!cs.length){ list.innerHTML = `<div class="empty"><i class="fa-regular fa-user"></i><p>No customers yet</p></div>`; return; }
-    list.innerHTML = `<div class="day-label">${cs.length} customer${cs.length===1?'':'s'} · most frequent first</div>` +
+    if(!cs.length){ list.innerHTML = `<div class="empty"><i class="fa-regular fa-user"></i><p>${t('noCustomers')}</p></div>`; return; }
+    list.innerHTML = `<div class="day-label">${cs.length} ${cs.length===1?t('customersCount'):t('customersCountPlural')} · ${t('mostFrequent')}</div>` +
       cs.map(c => `
         <div class="card" onclick="openCustomer('${c.key}')" style="cursor:pointer">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
             <div style="min-width:0">
               <div class="c-name" style="margin-bottom:6px">${esc(c.name)}
-                ${c.count>=3?'<span class="src" style="color:var(--purple);border-color:var(--purple)">Regular</span>':''}
-                ${c.noShows?'<span class="src" style="color:var(--red);border-color:var(--red)">'+c.noShows+' no-show</span>':''}
+                ${c.count>=3?'<span class="src" style="color:var(--purple);border-color:var(--purple)">'+t('regular')+'</span>':''}
+                ${c.noShows?'<span class="src" style="color:var(--red);border-color:var(--red)">'+c.noShows+' '+t('noShowBadge')+'</span>':''}
               </div>
               <div style="font-size:15px;color:var(--text2)">
-                ${c.count} booking${c.count===1?'':'s'} · £${c.total} spent
-                ${c.upcoming?' · <span style="color:var(--blue)">'+c.upcoming+' upcoming</span>':''}
+                ${c.count} ${c.count===1?t('bookingCount'):t('bookingCountPlural')} · £${c.total} ${t('spentLabel')}
+                ${c.upcoming?' · <span style="color:var(--blue)">'+c.upcoming+' '+t('upcomingLower')+'</span>':''}
               </div>
               ${c.usualService?`<div style="font-size:14px;color:var(--muted);margin-top:5px">${esc(c.usualService)} · ${esc(c.usualBarber)}</div>`:''}
             </div>
@@ -566,16 +737,16 @@ function render(){
 
   // ── Booking views ──
   let rows = BOOKINGS.filter(alive);
-  let emptyWord = 'yet';
-  if(FILTER==='today')    { rows = rows.filter(b=>b.iso===TODAY); emptyWord='today'; }
-  if(FILTER==='tomorrow') { rows = rows.filter(b=>b.iso===TOM);   emptyWord='tomorrow'; }
+  let emptyWord = t('nothingYet');
+  if(FILTER==='today')    { rows = rows.filter(b=>b.iso===TODAY); emptyWord=t('nothingToday'); }
+  if(FILTER==='tomorrow') { rows = rows.filter(b=>b.iso===TOM);   emptyWord=t('nothingTomorrow'); }
   if(FILTER==='upcoming') { rows = rows.filter(b=>b.iso>=TODAY); }
-  if(FILTER==='past')     { rows = rows.filter(b=>b.iso<TODAY).reverse(); emptyWord='in the past'; }
-  if(FILTER==='archive')  { rows = BOOKINGS.filter(b=>b.status==='Deleted').reverse(); emptyWord='in the archive'; }
+  if(FILTER==='past')     { rows = rows.filter(b=>b.iso<TODAY).reverse(); emptyWord=t('nothingPast'); }
+  if(FILTER==='archive')  { rows = BOOKINGS.filter(b=>b.status==='Deleted').reverse(); emptyWord=t('nothingArchive'); }
 
   if(!rows.length){
     const icon = FILTER==='archive' ? 'fa-solid fa-box-archive' : 'fa-regular fa-calendar';
-    list.innerHTML = `<div class="empty"><i class="${icon}"></i><p>Nothing ${emptyWord}</p></div>`;
+    list.innerHTML = `<div class="empty"><i class="${icon}"></i><p>${emptyWord}</p></div>`;
     return;
   }
 
@@ -584,9 +755,9 @@ function render(){
     const done = rows.filter(b=>b.status==='Done');
     const takings = done.reduce((s,b)=>s+priceOf(b.service),0);
     list.innerHTML = `<div class="stats" style="margin-bottom:20px">
-        <div class="stat blue"><div class="stat-n">${rows.length}</div><div class="stat-l">Bookings</div></div>
-        <div class="stat purple"><div class="stat-n">${done.length}</div><div class="stat-l">Completed</div></div>
-        <div class="stat white"><div class="stat-n">£${takings}</div><div class="stat-l">Takings</div></div>
+        <div class="stat blue"><div class="stat-n">${rows.length}</div><div class="stat-l">${t('bookings')}</div></div>
+        <div class="stat purple"><div class="stat-n">${done.length}</div><div class="stat-l">${t('completed')}</div></div>
+        <div class="stat white"><div class="stat-n">£${takings}</div><div class="stat-l">${t('takings')}</div></div>
       </div>`;
   } else {
     list.innerHTML = '';
@@ -615,13 +786,13 @@ function render(){
       <div class="card-top">
         <div><div class="c-time">${esc(b.time)}</div><div class="c-date">${esc(b.date)}</div></div>
         <div style="text-align:right;flex-shrink:0">
-          <div class="pill ${pill}">${esc(archived?'Archived':st)}</div>
+          <div class="pill ${pill}">${esc(archived?t('statusArchived'):statusLabel(st))}</div>
           <div style="font-size:15px;color:var(--muted);margin-top:7px">£${priceOf(b.service)}</div>
         </div>
       </div>
       <div class="c-name" ${k?`onclick="openCustomer('${k}')" style="cursor:pointer"`:''}>${esc(b.name)}
-        ${isRegular?'<span class="src" style="color:var(--purple);border-color:var(--purple)">Regular</span>':''}
-        ${b.source==='Phone'?'<span class="src">Phone</span>':''}
+        ${isRegular?'<span class="src" style="color:var(--purple);border-color:var(--purple)">'+t('regular')+'</span>':''}
+        ${b.source==='Phone'?'<span class="src">'+t('phoneBooking')+'</span>':''}
       </div>
       <div class="c-meta">
         <div class="chip b"><i class="fa-solid fa-scissors"></i><span>${esc(b.service)}</span></div>
@@ -631,14 +802,14 @@ function render(){
       </div>
       <div class="c-actions">
         ${archived ? `
-          <button class="act ok" onclick="restore(${b.row})"><i class="fa-solid fa-rotate-left"></i>Restore</button>
-          <button class="act del" onclick="destroy(${b.row})" style="flex:1"><i class="fa-solid fa-trash"></i>Delete forever</button>
+          <button class="act ok" onclick="restore(${b.row})"><i class="fa-solid fa-rotate-left"></i>${t('restore')}</button>
+          <button class="act del" onclick="destroy(${b.row})" style="flex:1"><i class="fa-solid fa-trash"></i>${t('deleteForever')}</button>
         ` : `
-          <a class="act call" href="tel:${esc(phone)}"><i class="fa-solid fa-phone"></i>Call</a>
-          <a class="act wa" href="${esc(waLink(b.phone,b.name,b.date,b.time))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>
+          <a class="act call" href="tel:${esc(phone)}"><i class="fa-solid fa-phone"></i>${t('call')}</a>
+          <a class="act wa" href="${esc(waLink(b.phone,b.name,b.date,b.time))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>${t('whatsapp')}</a>
           ${st==='Upcoming'
-            ? `<button class="act ok" onclick="setStatus(${b.row},'Done')"><i class="fa-solid fa-check"></i>Done</button>`
-            : `<button class="act" onclick="setStatus(${b.row},'Upcoming')"><i class="fa-solid fa-rotate-left"></i>Undo</button>`}
+            ? `<button class="act ok" onclick="setStatus(${b.row},'Done')"><i class="fa-solid fa-check"></i>${t('done')}</button>`
+            : `<button class="act" onclick="setStatus(${b.row},'Upcoming')"><i class="fa-solid fa-rotate-left"></i>${t('undo')}</button>`}
           <button class="act del" onclick="del(${b.row})" aria-label="Archive booking"><i class="fa-solid fa-box-archive"></i></button>
         `}
       </div>
@@ -650,7 +821,7 @@ function render(){
 function buildForm(){
   if(!CFG) return;
   $('f-service').innerHTML = CFG.services.map(s=>`<option value="${esc(s[0])}">${esc(s[0])}</option>`).join('');
-  $('f-barber').innerHTML  = '<option value="">Anyone available</option>' +
+  $('f-barber').innerHTML  = '<option value="">'+t('anyoneAvailable')+'</option>' +
     CFG.barbers.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
   $('f-date').min = TODAY;
   if(!$('f-date').value) $('f-date').value = TODAY;
@@ -660,7 +831,7 @@ function buildForm(){
 function buildTimes(){
   if(!CFG) return;
   const dv = $('f-date').value;
-  if(!dv){ $('f-time').innerHTML='<option value="">Pick a date</option>'; return; }
+  if(!dv){ $('f-time').innerHTML='<option value="">'+t('pickDate')+'</option>'; return; }
   const p = dv.split('-');
   const dow = new Date(+p[0],+p[1]-1,+p[2]).getDay();
   const hrs = CFG.hours[dow] || CFG.hours[1];
@@ -668,7 +839,7 @@ function buildTimes(){
   const dur = (CFG.services.find(s=>s[0]===svc)||[null,30])[1];
   let opts='';
   for(let m=hrs.open; m+dur<=hrs.close; m+=30) opts += `<option value="${minToTime(m)}">${minToTime(m)}</option>`;
-  $('f-time').innerHTML = opts || '<option value="">Closed that day</option>';
+  $('f-time').innerHTML = opts || '<option value="">'+t('closedThatDay')+'</option>';
 }
 
 $('f-date').onchange = buildTimes;
@@ -689,21 +860,23 @@ $('save-btn').onclick = async () => {
     email:$('f-email').value.trim(), service:$('f-service').value,
     barber:$('f-barber').value, date_iso:$('f-date').value, time:$('f-time').value
   };
-  if(!payload.name)  return ($('form-err').textContent='Customer name is required');
-  if(!payload.phone) return ($('form-err').textContent='Phone number is required');
-  if(!payload.time)  return ($('form-err').textContent='Pick a time');
+  if(!payload.name)  return ($('form-err').textContent=t('nameRequired'));
+  if(!payload.phone) return ($('form-err').textContent=t('phoneRequired'));
+  if(!payload.time)  return ($('form-err').textContent=t('pickTime'));
 
-  $('save-btn').disabled=true; $('save-btn').textContent='Saving…'; $('form-err').textContent='';
+  $('save-btn').disabled=true; $('save-btn').textContent=t('saving'); $('form-err').textContent='';
   try{
     const d = await api(payload);
-    if(!d.ok) throw new Error(d.error||'Could not save');
+    if(!d.ok) throw new Error(d.error||t('couldNotSave'));
     modal.classList.add('hidden');
     ['f-name','f-phone','f-email'].forEach(id=>$(id).value='');
     await load(KEY); render();
-    toast('Booking added for '+d.booking.name);
+    toast(t('bookingAddedFor')+' '+d.booking.name);
   }catch(e){ $('form-err').textContent = e.message; }
-  finally{ $('save-btn').disabled=false; $('save-btn').textContent='Confirm Booking'; }
+  finally{ $('save-btn').disabled=false; $('save-btn').textContent=t('confirmBooking'); }
 };
+
+applyLang();
 
 (async () => {
   if(!KEY) return;
@@ -715,7 +888,7 @@ $('save-btn').onclick = async () => {
     app.classList.add('hidden'); gate.classList.remove('hidden');
     $('gate-err').textContent = LAST_ERR; return;
   }
-  render(); loadConfig();
+  applyLang(); render(); loadConfig();
   setInterval(async()=>{ if(document.visibilityState==='visible'){ await load(KEY); render(); } },60000);
 })();
 </script>
