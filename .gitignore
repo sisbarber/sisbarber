@@ -1,20 +1,20 @@
-.DS_Store
+# ── Internal agency files — never publish ──
 CLAUDE.md
 AGENTS.md
 NEW_PROJECT_PROMPT.md
 TEMPLATE_PROMPT.md
 deploy.sh
-emailjs-customer-template.html
-emailjs-shop-template.html
 sis-barber-booking.skill
 .codex-preview/
+
+# ── Backend source: contains ADMIN_KEY ──
+apps-script.gs
+*.gs
+
+# ── Dead EmailJS templates ──
+emailjs-customer-template.html
+emailjs-shop-template.html
+
+# ── OS junk ──
 .DS_Store
-CLAUDE.md
-AGENTS.md
-NEW_PROJECT_PROMPT.md
-TEMPLATE_PROMPT.md
-deploy.sh
-emailjs-customer-template.html
-emailjs-shop-template.html
-sis-barber-booking.skill
-.codex-preview/
+**/.DS_Store

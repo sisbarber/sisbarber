@@ -1450,9 +1450,9 @@
             <div class="absolute top-0 left-0 w-full h-[2px] bg-white"></div>
             <div class="flex items-center space-x-3 text-emerald-400">
                 <i class="fa-solid fa-circle-check text-2xl"></i>
-                <h3 class="text-lg font-black uppercase tracking-widest text-white">Booking Confirmed</h3>
+                <h3 class="text-lg font-black uppercase tracking-widest text-white">Check Your Email</h3>
             </div>
-            <p class="text-zinc-400 text-xs font-light leading-relaxed">Your chair reservation has been safely registered. A confirmation will be sent to your mobile.</p>
+            <p class="text-zinc-400 text-xs font-light leading-relaxed">We've sent you an email with a confirm button. <strong class="text-white font-semibold">Tap it within 45 minutes</strong> to lock in your slot. Not in your inbox? Check your spam folder.</p>
             <div class="border-y border-zinc-800 py-4 space-y-2.5 text-xs font-mono">
                 <div class="flex justify-between"><span class="text-zinc-500">CLIENT:</span><span id="modal-summary-name" class="text-white font-bold"></span></div>
                 <div class="flex justify-between"><span class="text-zinc-500">EMAIL:</span><span id="modal-summary-email" class="text-white font-bold"></span></div>
@@ -1558,7 +1558,7 @@
         }
 
         // Google Apps Script Web App URL — powers the /admin booking dashboard
-        const BOOKINGS_API      = 'https://script.google.com/macros/s/AKfycbzIah6eP0vyCtzbZ0tjGPRrVGOa3fwKL3Cw6ALvD0zxABuzL0_mmWv3YGglJKQBL1d3/exec';
+        const BOOKINGS_API      = 'https://script.google.com/macros/s/AKfycbxw-LHBJ215bpzTerlb46YV93mW7ySGmE6juH18aXEZ3WplOpQ-9TATGBQFvAOENWlt/exec';
         const SHOP_EMAIL        = 'sisaygrmay12@gmail.com';
 
         // ══════════════════════════════════════════════════════════════════
@@ -1567,6 +1567,40 @@
         //    suggestions. Bookings persisted in localStorage so double-
         //    booking is prevented across page refreshes.
         // ══════════════════════════════════════════════════════════════════
+
+        // ══════════════════════════════════════════════════════════════════
+        // ANTI-BOT SIGNALS
+        // A scripted submitter posts instantly and never moves a pointer.
+        // These two values plus the hidden honeypot field are checked
+        // server-side; all three must look human or the booking is refused.
+        // ══════════════════════════════════════════════════════════════════
+        const FORM_LOADED_AT = Date.now();
+        let HUMAN_INTERACTION = false;
+        ['pointerdown','keydown','touchstart','mousemove','scroll'].forEach(function (ev) {
+            window.addEventListener(ev, function once() {
+                HUMAN_INTERACTION = true;
+                window.removeEventListener(ev, once);
+            }, { passive: true });
+        });
+
+        // ══════════════════════════════════════════════════════════════════
+        // UK PHONE VALIDATION
+        // Mirrors the server-side check so the customer gets instant feedback.
+        // ══════════════════════════════════════════════════════════════════
+        function normalizeUkPhone(raw) {
+            let p = String(raw || '').replace(/[\s()\-\. ]/g, '');
+            if (p.indexOf('+44') === 0)       p = '0' + p.slice(3);
+            else if (p.indexOf('0044') === 0) p = '0' + p.slice(4);
+            else if (p.indexOf('44') === 0 && (p.length === 12 || p.length === 13)) p = '0' + p.slice(2);
+            if (!/^\d+$/.test(p)) return null;
+            if (/^07\d{9}$/.test(p)) {
+                if (/^070/.test(p)) return null;
+                if (/^076/.test(p) && !/^07624/.test(p)) return null;
+                return p;
+            }
+            if (/^0[123]\d{8,9}$/.test(p)) return p;
+            return null;
+        }
 
         const BARBERS = ['Sis', 'Teddy'];
 
@@ -2091,6 +2125,17 @@
                 const duration  = getServiceDuration();
                 const startMin  = timeToMinutes(time);
 
+                // ── Validate UK phone before anything else ────────────────
+                const phoneOk = normalizeUkPhone(phone);
+                if (!phoneOk) {
+                    const el = document.getElementById('form-phone');
+                    el.classList.add('border-red-600');
+                    el.focus();
+                    alert('Please enter a valid UK phone number.\n\nFor example: 07123 456789 or +44 7123 456789');
+                    return;
+                }
+                document.getElementById('form-phone').classList.remove('border-red-600');
+
                 // Determine confirmed barber
                 let confirmedBarber = 'First Available Barber';
                 if (barberPref === 'specific') {
@@ -2153,11 +2198,25 @@
                             date:     dateLabel,
                             date_iso: dateStr,
                             time:     time,
-                            source:   'Website'
+                            // ── anti-bot signals ──
+                            website:  document.getElementById('form-honeypot')?.value || '',
+                            ts:       FORM_LOADED_AT,
+                            iv:       HUMAN_INTERACTION ? '1' : '0'
                         })
                     });
                     const out = await res.json();
-                    if (!out.ok) console.warn('Booking not saved:', out.error);
+                    if (!out.ok) {
+                        // Server rejected it — tell the customer why and stop.
+                        sendNote.classList.add('hidden');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Confirm Appointment';
+                        const alertEl = document.getElementById('availability-alert');
+                        alertEl.classList.remove('hidden');
+                        alertEl.className = 'text-xs p-4 border border-red-800 bg-red-950/30 text-red-300 leading-relaxed';
+                        alertEl.innerHTML = '<i class="fa-solid fa-circle-xmark mr-2"></i>' + sanitise(out.error);
+                        alertEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        return;
+                    }
                 } catch (e) {
                     console.warn('Booking save failed:', e);
                 }
