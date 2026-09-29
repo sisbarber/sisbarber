@@ -345,6 +345,7 @@ const STRINGS = {
     statusCancelled:'Cancelled', statusNoShow:'No-show', statusArchived:'Archived',
     statusPending:'Awaiting confirmation', confirmManually:'Confirm',
     statusReview:'Not marked', noShow:'No-show', markUp:'Mark',
+    timedOut:'Took too long to respond. Check your internet and tap Unlock again.',
     regular:'Regular', phoneBooking:'Phone', noShowBadge:'no-show',
     nothingToday:'Nothing today', nothingTomorrow:'Nothing tomorrow',
     nothingPast:'Nothing in the past', nothingArchive:'Nothing in the archive',
@@ -384,6 +385,7 @@ const STRINGS = {
     statusCancelled:'ተሰሪዙ', statusNoShow:'ኣይመጸን', statusArchived:'ተዓቚቡ',
     statusPending:'ምርግጋጽ ይጽበ', confirmManually:'ኣረጋግጽ',
     statusReview:'ኣይተመልከተን', noShow:'ኣይመጸን', markUp:'ምልክት',
+    timedOut:'ግዜ ወሲዱ። ኢንተርነትካ ኣረጋግጽ፡ ደጊምካ ክፈት ጠውቕ።',
     regular:'ቀዋሚ', phoneBooking:'ብስልኪ', noShowBadge:'ኣይመጸን',
     nothingToday:'ሎሚ ቆጸራ የለን', nothingTomorrow:'ጽባሕ ቆጸራ የለን',
     nothingPast:'ዝሓለፈ ቆጸራ የለን', nothingArchive:'ኣብ መዝገብ ዋላ ሓደ የለን',
@@ -502,22 +504,42 @@ function toast(msg, ok=true){
   document.body.appendChild(t); setTimeout(()=>t.remove(),3400);
 }
 
+/* Google Apps Script normally answers in 2–4s. If a request hangs the
+   user must be told, never left watching a spinner forever. */
+const REQ_TIMEOUT = 20000;
+
+async function fetchWithTimeout(url){
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), REQ_TIMEOUT);
+  try{
+    return await fetch(url, {signal: ctl.signal, cache: 'no-store'});
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function api(params){
   const qs = new URLSearchParams(Object.assign({key:KEY,t:Date.now()}, params||{}));
-  const r = await fetch(API+'?'+qs.toString());
+  const r = await fetchWithTimeout(API+'?'+qs.toString());
   return await r.json();
 }
 
 async function load(key){
   try{
-    const r = await fetch(API+'?key='+encodeURIComponent(key)+'&t='+Date.now());
+    const r = await fetchWithTimeout(API+'?key='+encodeURIComponent(key)+'&t='+Date.now());
+    if(!r.ok){ LAST_ERR = 'Server returned ' + r.status + '. Try again in a moment.'; return false; }
     const d = await r.json();
     if(!d.ok){ LAST_ERR = d.error==='unauthorised' ? t('wrongKey') : ('Server: '+(d.error||'?')); return false; }
     LAST_ERR='';
     BOOKINGS = (d.bookings||[]).sort((a,b)=>
       a.iso!==b.iso ? (a.iso||'').localeCompare(b.iso||'') : timeVal(a.time)-timeVal(b.time));
     return true;
-  }catch(e){ LAST_ERR=t('connFail')+' — '+e.message; return false; }
+  }catch(e){
+    LAST_ERR = e.name === 'AbortError'
+      ? t('timedOut')
+      : t('connFail')+' — '+e.message;
+    return false;
+  }
 }
 
 async function loadConfig(){
@@ -904,8 +926,10 @@ applyLang();
   $('list').innerHTML = '<div class="skel"></div><div class="skel"></div>';
   const ok = await load(KEY);
   if(!ok){
-    localStorage.removeItem('sis_admin_key');
+    // A timeout is not a bad key — keep it saved so a retry is one tap.
+    if(LAST_ERR !== t('timedOut')) localStorage.removeItem('sis_admin_key');
     app.classList.add('hidden'); gate.classList.remove('hidden');
+    $('key-input').value = LAST_ERR === t('timedOut') ? KEY : '';
     $('gate-err').textContent = LAST_ERR; return;
   }
   applyLang(); render(); loadConfig();
