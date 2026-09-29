@@ -136,6 +136,10 @@ header{border-bottom:1px solid var(--line);padding:18px 0 15px;margin-bottom:20p
 .p-cancelled{background:rgba(251,113,133,.16);color:var(--red);border:1px solid rgba(251,113,133,.45)}
 .p-pending{background:rgba(251,191,36,.16);color:#FBBF24;border:1px solid rgba(251,191,36,.5)}
 .card.pending{border-color:rgba(251,191,36,.35)}
+/* A past booking nobody marked off — outcome unknown */
+.p-review{background:rgba(168,168,179,.14);color:var(--muted);border:1px dashed rgba(168,168,179,.5)}
+.card.review{border-style:dashed;border-color:rgba(168,168,179,.3)}
+.act.noshow{color:var(--red);border-color:rgba(251,113,133,.45)}
 .c-name{font-size:21px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .src{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
   color:var(--muted);border:1px solid var(--line);padding:4px 9px;border-radius:6px}
@@ -340,6 +344,7 @@ const STRINGS = {
     statusUpcoming:'Upcoming', statusDone:'Done',
     statusCancelled:'Cancelled', statusNoShow:'No-show', statusArchived:'Archived',
     statusPending:'Awaiting confirmation', confirmManually:'Confirm',
+    statusReview:'Not marked', noShow:'No-show', markUp:'Mark',
     regular:'Regular', phoneBooking:'Phone', noShowBadge:'no-show',
     nothingToday:'Nothing today', nothingTomorrow:'Nothing tomorrow',
     nothingPast:'Nothing in the past', nothingArchive:'Nothing in the archive',
@@ -378,6 +383,7 @@ const STRINGS = {
     statusUpcoming:'ዝመጽእ', statusDone:'ተዛዚሙ',
     statusCancelled:'ተሰሪዙ', statusNoShow:'ኣይመጸን', statusArchived:'ተዓቚቡ',
     statusPending:'ምርግጋጽ ይጽበ', confirmManually:'ኣረጋግጽ',
+    statusReview:'ኣይተመልከተን', noShow:'ኣይመጸን', markUp:'ምልክት',
     regular:'ቀዋሚ', phoneBooking:'ብስልኪ', noShowBadge:'ኣይመጸን',
     nothingToday:'ሎሚ ቆጸራ የለን', nothingTomorrow:'ጽባሕ ቆጸራ የለን',
     nothingPast:'ዝሓለፈ ቆጸራ የለን', nothingArchive:'ኣብ መዝገብ ዋላ ሓደ የለን',
@@ -777,18 +783,25 @@ function render(){
       html += `<div class="day-label">${esc(b.date)||'No date'}</div>`; lastDay=b.date;
     }
     const st = b.status||'Upcoming';
-    const pill = st==='Done'?'p-done':st==='Pending'?'p-pending':(st==='Cancelled'||st==='No-show'||st==='Deleted')?'p-cancelled':'p-up';
+    // A date that has already passed but was never marked off: the outcome
+    // is unknown, so it must not keep claiming to be 'Upcoming'.
+    const stale = st==='Upcoming' && b.iso && b.iso < TODAY;
+    const pill = st==='Done' ? 'p-done'
+               : st==='Pending' ? 'p-pending'
+               : stale ? 'p-review'
+               : (st==='Cancelled'||st==='No-show'||st==='Deleted') ? 'p-cancelled'
+               : 'p-up';
     const phone = String(b.phone||'').replace(/\s/g,'');
     const k = custKey(b);
     const isRegular = counts[k] >= 3;
     const archived = st==='Deleted';
 
     html += `
-    <div class="card ${st==='Pending'?'pending':st!=='Upcoming'?'done':''}">
+    <div class="card ${st==='Pending'?'pending':stale?'review':st!=='Upcoming'?'done':''}">
       <div class="card-top">
         <div><div class="c-time">${esc(b.time)}</div><div class="c-date">${esc(b.date)}</div></div>
         <div style="text-align:right;flex-shrink:0">
-          <div class="pill ${pill}">${esc(archived?t('statusArchived'):statusLabel(st))}</div>
+          <div class="pill ${pill}">${esc(archived?t('statusArchived'):stale?t('statusReview'):statusLabel(st))}</div>
           <div style="font-size:15px;color:var(--muted);margin-top:7px">£${priceOf(b.service)}</div>
         </div>
       </div>
@@ -811,6 +824,9 @@ function render(){
           <a class="act wa" href="${esc(waLink(b.phone,b.name,b.date,b.time))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>${t('whatsapp')}</a>
           ${st==='Pending'
             ? `<button class="act ok" onclick="setStatus(${b.row},'Upcoming')"><i class="fa-solid fa-check-double"></i>${t('confirmManually')}</button>`
+            : stale
+            ? `<button class="act ok" onclick="setStatus(${b.row},'Done')"><i class="fa-solid fa-check"></i>${t('done')}</button>
+               <button class="act noshow" onclick="setStatus(${b.row},'No-show')"><i class="fa-solid fa-user-xmark"></i>${t('noShow')}</button>`
             : st==='Upcoming'
             ? `<button class="act ok" onclick="setStatus(${b.row},'Done')"><i class="fa-solid fa-check"></i>${t('done')}</button>`
             : `<button class="act" onclick="setStatus(${b.row},'Upcoming')"><i class="fa-solid fa-rotate-left"></i>${t('undo')}</button>`}
