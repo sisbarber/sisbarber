@@ -202,6 +202,100 @@
             .barber-card:hover .barber-photo img { transform: none; }
         }
 
+        /* ══════════════════════════════════════════════════════════
+           NEXT STEP — post-booking instructions
+           The booking is only held until the customer clicks the
+           email link, so this has to read as an instruction, not
+           a congratulation.
+           ══════════════════════════════════════════════════════════ */
+        .next-step {
+            border: 1px solid rgba(251,191,36,.35);
+            border-left: 3px solid #FBBF24;
+            background: rgba(251,191,36,.07);
+            padding: 18px;
+        }
+        .next-step-label {
+            font-size: 10px; font-weight: 800; letter-spacing: 2px;
+            text-transform: uppercase; color: #FBBF24; margin-bottom: 16px;
+        }
+        .next-step-list { list-style: none; padding: 0; margin: 0; }
+        .next-step-list li {
+            display: flex; gap: 12px; align-items: flex-start;
+            font-size: 13px; line-height: 1.6; color: #d4d4d8;
+            font-weight: 300; margin-bottom: 12px;
+        }
+        .next-step-list li span {
+            flex-shrink: 0;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: linear-gradient(135deg, #3B82F6, #A855F7);
+            color: #fff; font-size: 11px; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            margin-top: 1px;
+        }
+        .next-step-warn {
+            font-size: 12px; line-height: 1.6; color: #a1a1aa;
+            font-weight: 300; margin-top: 4px; padding-top: 14px;
+            border-top: 1px solid rgba(251,191,36,.2);
+            display: flex; gap: 9px; align-items: flex-start;
+        }
+        .next-step-warn i { color: #FBBF24; margin-top: 3px; flex-shrink: 0; }
+        .next-step-warn strong { color: #fff; font-weight: 600; }
+
+        /* ══════════════════════════════════════════════════════════
+           FIND US — landmark directions + shopfront photo
+           ══════════════════════════════════════════════════════════ */
+        .find-us {
+            border: 1px solid #1f1f23;
+            border-left: 3px solid #3B82F6;
+            background: rgba(59,130,246,.05);
+            padding: 18px 20px;
+            margin-top: 8px;
+        }
+        .find-us-title {
+            font-size: 11px; font-weight: 800; letter-spacing: 2px;
+            text-transform: uppercase; color: #fff; margin-bottom: 14px;
+            display: flex; align-items: center; gap: 9px;
+        }
+        .find-us-title i { color: #3B82F6; }
+        .find-us-list { list-style: none; padding: 0; margin: 0; }
+        .find-us-list li {
+            font-size: 13px; line-height: 1.7; color: #a1a1aa;
+            font-weight: 300; padding-left: 18px; position: relative; margin-bottom: 9px;
+        }
+        .find-us-list li::before {
+            content: '›'; position: absolute; left: 0; top: -1px;
+            color: #A855F7; font-weight: 700; font-size: 15px;
+        }
+        .find-us-list strong { color: #fff; font-weight: 600; }
+        .find-us-btn {
+            display: inline-flex; align-items: center; gap: 9px;
+            margin-top: 14px; padding: 12px 18px;
+            font-size: 11px; font-weight: 800; letter-spacing: 1.5px;
+            text-transform: uppercase; text-decoration: none; color: #fff;
+            background: linear-gradient(135deg, #3B82F6, #A855F7);
+            transition: opacity .25s ease;
+        }
+        .find-us-btn:hover { opacity: .85; }
+
+        .shopfront { position: relative; margin: 0; border: 1px solid #1f1f23; background: #0D0D0D; }
+        .shopfront img {
+            display: block; width: 100%; height: auto;
+            aspect-ratio: 16 / 9; object-fit: cover;
+        }
+        .shopfront figcaption {
+            padding: 14px 16px;
+            font-size: 12px; color: #a1a1aa; font-weight: 300;
+            border-top: 1px solid #1f1f23;
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+        }
+        .shopfront-pin {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+            text-transform: uppercase; color: #fff;
+            background: linear-gradient(135deg, #3B82F6, #A855F7);
+            padding: 5px 10px; flex-shrink: 0;
+        }
+
         /* ── Barber picker inside the booking form ── */
         .barber-pick {
             display: grid;
@@ -1395,10 +1489,43 @@
                         <li class="flex items-center"><i class="fa-solid fa-phone w-6 text-white"></i> 07386 032631</li>
                         <li class="flex items-center"><i class="fa-regular fa-envelope w-6 text-white"></i> sisaygrmay12@gmail.com</li>
                     </ul>
+
+                    <!-- Landmark directions — the postcode alone confuses people -->
+                    <div class="find-us">
+                        <p class="find-us-title"><i class="fa-solid fa-eye"></i> Look for the blue shopfront</p>
+                        <ul class="find-us-list">
+                            <li>We're in <strong>Old Square Shopping Centre</strong>, on the parade of shops.</li>
+                            <li>Our sign is <strong>blue with white lettering</strong> — "SIS BARBER SHOP".</li>
+                            <li>We sit <strong>between Paradise Café and Angel Fashions</strong> (the pink SALE windows).</li>
+                            <li>Directly <strong>opposite CeX</strong> — the shop with "Games Phones DVDs" above it.</li>
+                            <li>The <strong>blue and white striped market tents</strong> are right outside us.</li>
+                        </ul>
+                        <a href="https://maps.google.com/?q=Sis+Barber+Shop,+Unit+12,+Shopping+Centre,+Walsall+WS1+1PY"
+                           target="_blank" rel="noopener" class="find-us-btn">
+                            <i class="fa-solid fa-diamond-turn-right"></i> Open in Google Maps
+                        </a>
+                    </div>
                 </div>
-                <div class="lg:col-span-2 border border-zinc-900 bg-zinc-900/20 p-2 h-[350px] relative">
-                    <div class="w-full h-full bg-zinc-950">
-                        <iframe src="https://maps.google.com/maps?q=Unit%2012,%20Shopping%20Centre,%20Walsall%20WS1%201PY&t=&z=16&ie=UTF8&iwloc=&output=embed" class="w-full h-full border-0 grayscale invert contrast-115" allowfullscreen="" loading="lazy"></iframe>
+                <div class="lg:col-span-2 space-y-4">
+                    <!-- What the shop actually looks like from the square -->
+                    <figure class="shopfront">
+                        <picture>
+                            <source media="(min-width: 700px)" srcset="assets/images/shop_location.webp" type="image/webp">
+                            <source media="(min-width: 700px)" srcset="assets/images/shop_location.jpg"  type="image/jpeg">
+                            <source srcset="assets/images/shop_location_sm.webp" type="image/webp">
+                            <img src="assets/images/shop_location_sm.jpg"
+                                 alt="Sis Barber Shop shopfront in Old Square Shopping Centre, Walsall — blue sign, next to Paradise Café, opposite CeX, with striped market tents outside"
+                                 width="1600" height="900" loading="lazy" decoding="async">
+                        </picture>
+                        <figcaption>
+                            <span class="shopfront-pin"><i class="fa-solid fa-location-dot"></i> This is us</span>
+                            The blue shopfront on the right, just past Paradise Café
+                        </figcaption>
+                    </figure>
+                    <div class="border border-zinc-900 bg-zinc-900/20 p-2 h-[280px]">
+                        <div class="w-full h-full bg-zinc-950">
+                            <iframe src="https://maps.google.com/maps?q=Unit%2012,%20Shopping%20Centre,%20Walsall%20WS1%201PY&t=&z=16&ie=UTF8&iwloc=&output=embed" class="w-full h-full border-0 grayscale invert contrast-115" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1422,11 +1549,24 @@
     <div id="success-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition duration-300">
         <div class="bg-zinc-900 border border-zinc-800 p-8 max-w-md w-full relative shadow-2xl text-left space-y-6">
             <div class="absolute top-0 left-0 w-full h-[2px] bg-white"></div>
-            <div class="flex items-center space-x-3 text-emerald-400">
-                <i class="fa-solid fa-circle-check text-2xl"></i>
-                <h3 class="text-lg font-black uppercase tracking-widest text-white">Check Your Email</h3>
+            <div class="flex items-center space-x-3 text-amber-400">
+                <i class="fa-solid fa-envelope-open-text text-2xl"></i>
+                <h3 class="text-lg font-black uppercase tracking-widest text-white">One Last Step</h3>
             </div>
-            <p class="text-zinc-400 text-xs font-light leading-relaxed">We've sent you an email with a confirm button. <strong class="text-white font-semibold">Tap it within 45 minutes</strong> to lock in your slot. Not in your inbox? Check your spam folder.</p>
+
+            <!-- The booking is NOT live yet. Make that impossible to miss. -->
+            <div class="next-step">
+                <p class="next-step-label">Your slot is held, not confirmed</p>
+                <ol class="next-step-list">
+                    <li><span>1</span> Open your email — we've just sent it to <strong id="modal-summary-email-inline" class="text-white"></strong></li>
+                    <li><span>2</span> Tap the big <strong class="text-white">“Confirm My Appointment”</strong> button inside</li>
+                    <li><span>3</span> That's it — you'll see a confirmation page</li>
+                </ol>
+                <p class="next-step-warn">
+                    <i class="fa-solid fa-clock"></i>
+                    You have <strong>45 minutes</strong> before the slot is released. Can't see the email? Check your <strong>spam or junk</strong> folder.
+                </p>
+            </div>
             <div class="border-y border-zinc-800 py-4 space-y-2.5 text-xs font-mono">
                 <div class="flex justify-between"><span class="text-zinc-500">CLIENT:</span><span id="modal-summary-name" class="text-white font-bold"></span></div>
                 <div class="flex justify-between"><span class="text-zinc-500">EMAIL:</span><span id="modal-summary-email" class="text-white font-bold"></span></div>
@@ -2043,7 +2183,37 @@
 
             // ── Date Input ───────────────────────────────────────────────
             const datePicker = document.getElementById('date-picker');
-            if (datePicker) datePicker.setAttribute('min', new Date().toISOString().split('T')[0]);
+            // ── Date picker: past dates greyed out and unselectable ──────
+            // toISOString() returns UTC, which is a day behind during BST
+            // late at night — so the local date is built by hand instead.
+            if (datePicker) {
+                const localIso = d => d.getFullYear() + '-' +
+                    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(d.getDate()).padStart(2, '0');
+
+                const today = localIso(new Date());
+                const horizon = new Date();
+                horizon.setDate(horizon.getDate() + 90);
+
+                datePicker.min = today;                 // greys out every earlier day
+                datePicker.max = localIso(horizon);      // no bookings a year out
+                if (!datePicker.value) datePicker.value = today;
+
+                // Safety net: some browsers still allow a typed-in date,
+                // and min/max are advisory until the form validates.
+                datePicker.addEventListener('change', () => {
+                    if (datePicker.value && datePicker.value < datePicker.min) {
+                        datePicker.value = datePicker.min;
+                        const alertEl = document.getElementById('availability-alert');
+                        if (alertEl) {
+                            alertEl.classList.remove('hidden');
+                            alertEl.className = 'text-xs p-4 border border-amber-800 bg-amber-950/30 text-amber-300 leading-relaxed';
+                            alertEl.innerHTML = '<i class="fa-solid fa-circle-info mr-2"></i>That date has already passed — we\'ve moved you to today.';
+                        }
+                        updateTimeSlots();
+                    }
+                });
+            }
 
             // ── Booking duration note on load ────────────────────────────
             updateTimeSlots();
@@ -2225,6 +2395,8 @@
 
                 document.getElementById('modal-summary-name').textContent = name.toUpperCase();
                 document.getElementById('modal-summary-email').textContent = email || 'Not provided';
+                const inlineEmail = document.getElementById('modal-summary-email-inline');
+                if (inlineEmail) inlineEmail.textContent = email || 'your email';
                 document.getElementById('modal-summary-service').textContent = service.split(' —')[0].toUpperCase();
                 document.getElementById('modal-summary-barber').textContent = confirmedBarber.toUpperCase();
                 document.getElementById('modal-summary-datetime').textContent = `${dateLabel} @ ${time}`;
