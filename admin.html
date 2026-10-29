@@ -346,6 +346,7 @@ const STRINGS = {
     statusPending:'Awaiting confirmation', confirmManually:'Confirm',
     statusReview:'Not marked', noShow:'No-show', markUp:'Mark',
     timedOut:'Took too long to respond. Check your internet and tap Unlock again.',
+    newDay:'New day — list refreshed',
     regular:'Regular', phoneBooking:'Phone', noShowBadge:'no-show',
     nothingToday:'Nothing today', nothingTomorrow:'Nothing tomorrow',
     nothingPast:'Nothing in the past', nothingArchive:'Nothing in the archive',
@@ -386,6 +387,7 @@ const STRINGS = {
     statusPending:'ምርግጋጽ ይጽበ', confirmManually:'ኣረጋግጽ',
     statusReview:'ኣይተመልከተን', noShow:'ኣይመጸን', markUp:'ምልክት',
     timedOut:'ግዜ ወሲዱ። ኢንተርነትካ ኣረጋግጽ፡ ደጊምካ ክፈት ጠውቕ።',
+    newDay:'ሓዳስ መዓልቲ — ተሓዲሱ',
     regular:'ቀዋሚ', phoneBooking:'ብስልኪ', noShowBadge:'ኣይመጸን',
     nothingToday:'ሎሚ ቆጸራ የለን', nothingTomorrow:'ጽባሕ ቆጸራ የለን',
     nothingPast:'ዝሓለፈ ቆጸራ የለን', nothingArchive:'ኣብ መዝገብ ዋላ ሓደ የለን',
@@ -480,9 +482,17 @@ const $ = id => document.getElementById(id);
 const gate = $('gate'), app = $('app'), modal = $('modal');
 
 const iso = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-const TODAY = iso(new Date());
-const TOM = (()=>{const d=new Date();d.setDate(d.getDate()+1);return iso(d);})();
-const WEEK = (()=>{const d=new Date();d.setDate(d.getDate()+7);return iso(d);})();
+/* Sis keeps this open on his phone for days at a time, so these must be
+   recalculated on every render — a fixed const would still be showing
+   yesterday's date tomorrow morning and report "0 bookings today". */
+let TODAY, TOM, WEEK;
+function refreshDates(){
+  const d = new Date();
+  TODAY = iso(d);
+  const t = new Date(); t.setDate(t.getDate()+1); TOM = iso(t);
+  const w = new Date(); w.setDate(w.getDate()+7); WEEK = iso(w);
+}
+refreshDates();
 
 function timeVal(t){
   const m = String(t).match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
@@ -732,6 +742,7 @@ function waLink(phone,name,date,time){
 }
 
 function render(){
+  refreshDates();
   const live = b => b.status!=='Cancelled' && b.status!=='Deleted';
   $('s-today').textContent = BOOKINGS.filter(b=>b.iso===TODAY && live(b)).length;
   $('s-tom').textContent   = BOOKINGS.filter(b=>b.iso===TOM && live(b)).length;
@@ -862,6 +873,7 @@ function render(){
 
 function buildForm(){
   if(!CFG) return;
+  refreshDates();
   $('f-service').innerHTML = CFG.services.map(s=>`<option value="${esc(s[0])}">${esc(s[0])}</option>`).join('');
   $('f-barber').innerHTML  = '<option value="">'+t('anyoneAvailable')+'</option>' +
     CFG.barbers.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
@@ -934,6 +946,16 @@ applyLang();
   }
   applyLang(); render(); loadConfig();
   setInterval(async()=>{ if(document.visibilityState==='visible'){ await load(KEY); render(); } },60000);
+
+  // Phone unlocked after being asleep: the date may have rolled over.
+  document.addEventListener('visibilitychange', async () => {
+    if(document.visibilityState === 'visible'){
+      const before = TODAY;
+      refreshDates();
+      if(TODAY !== before) toast(t('newDay'));
+      await load(KEY); render();
+    }
+  });
 })();
 </script>
 </body>

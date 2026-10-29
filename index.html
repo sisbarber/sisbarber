@@ -2336,9 +2336,12 @@
                     addBookingToLedger(confirmedBarber, dateStr, startMin, duration);
                 }
 
-                // Show WhatsApp confirmation
+                // NOTE: WhatsApp is opened AFTER the booking is saved.
+                // window.open() switches to the WhatsApp app on mobile, which
+                // backgrounds this page — any request still in flight gets
+                // killed. Opening it first meant the shop got a WhatsApp
+                // message for a booking that never reached the system.
                 const waMsg = `New Booking — Sis Barber Shop\nService: ${service}\nBarber: ${confirmedBarber}\nDate: ${dateLabel} at ${time}\nName: ${name}\nPhone: ${phone}${email ? '\nEmail: ' + email : ''}`;
-                openWhatsApp(waMsg);
 
                 // Refresh time slot dropdown to reflect new booking
                 updateTimeSlots();
@@ -2357,6 +2360,9 @@
                     const res = await fetch(BOOKINGS_API, {
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        // keepalive lets the request finish even if the page
+                        // gets backgrounded mid-flight (app switch, lock screen)
+                        keepalive: true,
                         body: JSON.stringify({
                             name:     name,
                             phone:    phone,
@@ -2386,8 +2392,25 @@
                         return;
                     }
                 } catch (e) {
+                    // Network died mid-save. Do NOT pretend it worked —
+                    // the customer would walk in expecting an appointment
+                    // the shop has never seen.
                     console.warn('Booking save failed:', e);
+                    sendNote.classList.add('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Confirm Appointment';
+                    const alertEl = document.getElementById('availability-alert');
+                    alertEl.classList.remove('hidden');
+                    alertEl.className = 'text-xs p-4 border border-red-800 bg-red-950/30 text-red-300 leading-relaxed';
+                    alertEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i>' +
+                        'We couldn\'t save your booking — please check your connection and try again, or call us on ' +
+                        '<a href="tel:07386032631" class="underline text-white">07386 032631</a>.';
+                    alertEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
                 }
+
+                // Saved successfully — only now is it safe to leave the page.
+                openWhatsApp(waMsg);
 
                 // Show success modal
                 sendNote.classList.add('hidden');
