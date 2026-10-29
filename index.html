@@ -203,6 +203,22 @@
         }
 
         /* ══════════════════════════════════════════════════════════
+           OVERLAY CLEARANCE
+           The cookie banner (fixed, z-9999, ~110px) and the chat
+           bubble sit over the bottom of the viewport. Without this,
+           scrolling or focusing a field can park it underneath them,
+           so taps land on the overlay instead of the control.
+           ══════════════════════════════════════════════════════════ */
+        #appointment-form input,
+        #appointment-form select,
+        #appointment-form button,
+        #submit-btn,
+        #availability-alert {
+            scroll-margin-bottom: 160px;
+            scroll-margin-top: 90px;
+        }
+
+        /* ══════════════════════════════════════════════════════════
            NEXT STEP — post-booking instructions
            The booking is only held until the customer clicks the
            email link, so this has to read as an instruction, not
@@ -2581,28 +2597,50 @@
     </div>
 
     <script>
-        // Cookie consent management
-        (function() {
-            const CONSENT_KEY = 'sis_cookie_consent';
-            const banner = document.getElementById('cookie-banner');
+        // ══════════════════════════════════════════════════════════
+        // Cookie consent
+        // The banner is position:fixed at z-index 9999, so it sits on
+        // top of whatever is at the bottom of the viewport. Without
+        // the padding below, it covered the Confirm Appointment button
+        // and swallowed the tap — the form looked broken.
+        // ══════════════════════════════════════════════════════════
+        const CONSENT_KEY = 'sis_cookie_consent';
 
-            // Show banner if no consent stored yet
-            if (!localStorage.getItem(CONSENT_KEY)) {
-                if (banner) banner.style.display = 'flex';
+        function padForBanner() {
+            const b = document.getElementById('cookie-banner');
+            if (!b || b.style.display === 'none') {
+                document.body.style.paddingBottom = '';
+                return;
+            }
+            // Reserve the banner's height (plus a little) so every
+            // control can be scrolled clear of it.
+            document.body.style.paddingBottom = (b.offsetHeight + 24) + 'px';
+        }
+
+        function hideCookieBanner(value) {
+            try { localStorage.setItem(CONSENT_KEY, value); } catch (e) {}
+            const b = document.getElementById('cookie-banner');
+            if (b) b.style.display = 'none';
+            document.body.style.paddingBottom = '';
+        }
+
+        function acceptCookies()  { hideCookieBanner('accepted'); }
+        function declineCookies() { hideCookieBanner('essential'); }
+
+        (function() {
+            const banner = document.getElementById('cookie-banner');
+            let stored = null;
+            try { stored = localStorage.getItem(CONSENT_KEY); } catch (e) {}
+
+            if (!stored && banner) {
+                banner.style.display = 'flex';
+                padForBanner();
+                window.addEventListener('resize', padForBanner);
+                // Height changes once fonts load and text reflows
+                setTimeout(padForBanner, 400);
+                setTimeout(padForBanner, 1500);
             }
         })();
-
-        function acceptCookies() {
-            localStorage.setItem('sis_cookie_consent', 'accepted');
-            const b = document.getElementById('cookie-banner');
-            if (b) b.style.display = 'none';
-        }
-
-        function declineCookies() {
-            localStorage.setItem('sis_cookie_consent', 'essential');
-            const b = document.getElementById('cookie-banner');
-            if (b) b.style.display = 'none';
-        }
     </script>
 </body>
 </html>
