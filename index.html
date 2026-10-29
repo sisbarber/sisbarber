@@ -2288,6 +2288,31 @@
                 const duration  = getServiceDuration();
                 const startMin  = timeToMinutes(time);
 
+                // Clear any message left over from a previous attempt,
+                // otherwise a stale error sits there and confuses people.
+                clearAvailabilityAlert();
+
+                // ── Service and time must actually be chosen ──────────────
+                const problem =
+                    !service ? { el: 'form-service', msg: 'Please choose a service first.' } :
+                    !dateStr ? { el: 'date-picker',  msg: 'Please choose a date.' } :
+                    !time    ? { el: 'form-time',    msg: 'Please choose a time for your appointment.' } :
+                    null;
+
+                if (problem) {
+                    const el = document.getElementById(problem.el);
+                    el.classList.add('border-red-600');
+                    el.focus();
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const alertEl = document.getElementById('availability-alert');
+                    alertEl.classList.remove('hidden');
+                    alertEl.className = 'text-xs p-4 border border-red-800 bg-red-950/30 text-red-300 leading-relaxed';
+                    alertEl.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-2"></i>' + problem.msg;
+                    return;
+                }
+                ['form-service','date-picker','form-time'].forEach(id =>
+                    document.getElementById(id).classList.remove('border-red-600'));
+
                 // ── Validate UK phone before anything else ────────────────
                 const phoneOk = normalizeUkPhone(phone);
                 if (!phoneOk) {
