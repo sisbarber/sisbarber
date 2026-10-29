@@ -202,6 +202,24 @@
             .barber-card:hover .barber-photo img { transform: none; }
         }
 
+        /* ── Submit feedback box — always visible, sits above the button ── */
+        .form-message {
+            padding: 16px 18px;
+            font-size: 14px;
+            line-height: 1.6;
+            font-weight: 500;
+            border: 1px solid;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .form-message.hidden { display: none; }
+        .form-message i { margin-top: 3px; flex-shrink: 0; }
+        .form-message a { color: #fff; text-decoration: underline; font-weight: 700; }
+        .form-message.is-error { background: rgba(127,29,29,.35); border-color: #b91c1c; color: #fecaca; }
+        .form-message.is-warn  { background: rgba(120,53,15,.35); border-color: #d97706; color: #fde68a; }
+        .form-message.is-info  { background: rgba(30,58,138,.35); border-color: #3B82F6; color: #bfdbfe; }
+
         /* ══════════════════════════════════════════════════════════
            OVERLAY CLEARANCE
            The cookie banner (fixed, z-9999, ~110px) and the chat
@@ -1386,10 +1404,13 @@
                         </div>
 
                         <div class="pt-4 space-y-3">
+                            <!-- Submit feedback. Deliberately NOT inside the barber
+                                 panel, which is hidden in "Anyone available" mode. -->
+                            <div id="form-message" class="form-message hidden" role="alert" aria-live="assertive"></div>
                             <button type="submit" id="submit-btn" class="w-full bg-white text-black font-black uppercase tracking-widest px-8 py-5 text-sm hover:bg-zinc-200 transition duration-300 border-2 border-white">
                                 Confirm Appointment
                             </button>
-                            <div id="email-sending-note" class="hidden text-center text-[11px] text-zinc-500">Sending confirmation email…</div>
+                            <div id="email-sending-note" class="hidden text-center text-[11px] text-zinc-500">Saving your booking — this takes a few seconds…</div>
                         </div>
                     </form>
                 </div>
@@ -1738,6 +1759,27 @@
             }
             if (/^0[123]\d{8,9}$/.test(p)) return p;
             return null;
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // SUBMIT FEEDBACK
+        // One always-visible box directly above the Confirm button. Every
+        // message the customer must see goes here — never into the barber
+        // panel, which is hidden when "Anyone available" is selected.
+        // ══════════════════════════════════════════════════════════════════
+        function showFormMessage(html, tone) {
+            const box = document.getElementById('form-message');
+            if (!box) { alert(html.replace(/<[^>]+>/g, '')); return; }
+            const icon = tone === 'warn' ? 'fa-circle-info'
+                       : tone === 'info' ? 'fa-spinner fa-spin'
+                       : 'fa-circle-exclamation';
+            box.className = 'form-message is-' + (tone || 'error');
+            box.innerHTML = '<i class="fa-solid ' + icon + '"></i><div>' + html + '</div>';
+            box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        function clearFormMessage() {
+            const box = document.getElementById('form-message');
+            if (box) { box.className = 'form-message hidden'; box.innerHTML = ''; }
         }
 
         // Mirrors the server check. Requires a real TLD, which the browser
@@ -2228,12 +2270,7 @@
                 datePicker.addEventListener('change', () => {
                     if (datePicker.value && datePicker.value < datePicker.min) {
                         datePicker.value = datePicker.min;
-                        const alertEl = document.getElementById('availability-alert');
-                        if (alertEl) {
-                            alertEl.classList.remove('hidden');
-                            alertEl.className = 'text-xs p-4 border border-amber-800 bg-amber-950/30 text-amber-300 leading-relaxed';
-                            alertEl.innerHTML = '<i class="fa-solid fa-circle-info mr-2"></i>That date has already passed — we\'ve moved you to today.';
-                        }
+                        showFormMessage('That date has already passed — we\'ve moved you to today.', 'warn');
                         updateTimeSlots();
                     }
                 });
@@ -2307,6 +2344,7 @@
                 // Clear any message left over from a previous attempt,
                 // otherwise a stale error sits there and confuses people.
                 clearAvailabilityAlert();
+                clearFormMessage();
 
                 // ── Service and time must actually be chosen ──────────────
                 const problem =
@@ -2318,12 +2356,8 @@
                 if (problem) {
                     const el = document.getElementById(problem.el);
                     el.classList.add('border-red-600');
-                    el.focus();
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    const alertEl = document.getElementById('availability-alert');
-                    alertEl.classList.remove('hidden');
-                    alertEl.className = 'text-xs p-4 border border-red-800 bg-red-950/30 text-red-300 leading-relaxed';
-                    alertEl.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-2"></i>' + problem.msg;
+                    showFormMessage(problem.msg, 'error');
+                    setTimeout(() => el.focus(), 400);
                     return;
                 }
                 ['form-service','date-picker','form-time'].forEach(id =>
@@ -2335,7 +2369,7 @@
                     const el = document.getElementById('form-phone');
                     el.classList.add('border-red-600');
                     el.focus();
-                    alert('Please enter a valid UK phone number.\n\nFor example: 07123 456789 or +44 7123 456789');
+                    showFormMessage('Please enter a valid UK mobile or landline number — for example <strong>07123 456789</strong>.', 'error');
                     return;
                 }
                 document.getElementById('form-phone').classList.remove('border-red-600');
@@ -2347,7 +2381,7 @@
                     const el = document.getElementById('form-email');
                     el.classList.add('border-red-600');
                     el.focus();
-                    alert('Please enter a valid email address.\n\nWe send your confirmation link there, so it needs to be one you can open.');
+                    showFormMessage('Please enter a valid email address — we send your booking details there.', 'error');
                     return;
                 }
                 document.getElementById('form-email').classList.remove('border-red-600');
@@ -2399,7 +2433,11 @@
                 const submitBtn = document.getElementById('submit-btn');
                 sendNote.classList.remove('hidden');
                 submitBtn.disabled = true;
-                submitBtn.textContent = 'Sending…';
+                submitBtn.textContent = 'Saving your booking…';
+
+                // Never leave the customer staring at a spinner: give up after 30s
+                const saveCtl = new AbortController();
+                const saveTimer = setTimeout(() => saveCtl.abort(), 30000);
 
                 // ── Save booking + send both confirmation emails ─────────
                 // One call: writes to the shop dashboard, emails the shop,
@@ -2411,6 +2449,7 @@
                         // keepalive lets the request finish even if the page
                         // gets backgrounded mid-flight (app switch, lock screen)
                         keepalive: true,
+                        signal: saveCtl.signal,
                         body: JSON.stringify({
                             name:     name,
                             phone:    phone,
@@ -2426,20 +2465,19 @@
                             iv:       HUMAN_INTERACTION ? '1' : '0'
                         })
                     });
+                    clearTimeout(saveTimer);
                     const out = await res.json();
                     if (!out.ok) {
                         // Server rejected it — tell the customer why and stop.
                         sendNote.classList.add('hidden');
                         submitBtn.disabled = false;
                         submitBtn.textContent = 'Confirm Appointment';
-                        const alertEl = document.getElementById('availability-alert');
-                        alertEl.classList.remove('hidden');
-                        alertEl.className = 'text-xs p-4 border border-red-800 bg-red-950/30 text-red-300 leading-relaxed';
-                        alertEl.innerHTML = '<i class="fa-solid fa-circle-xmark mr-2"></i>' + sanitise(out.error);
-                        alertEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        showFormMessage(sanitise(out.error) +
+                            '<br><span style="opacity:.8">Need help? Call <a href="tel:07386032631">07386 032631</a>.</span>', 'error');
                         return;
                     }
                 } catch (e) {
+                    clearTimeout(saveTimer);
                     // Network died mid-save. Do NOT pretend it worked —
                     // the customer would walk in expecting an appointment
                     // the shop has never seen.
@@ -2447,13 +2485,11 @@
                     sendNote.classList.add('hidden');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Confirm Appointment';
-                    const alertEl = document.getElementById('availability-alert');
-                    alertEl.classList.remove('hidden');
-                    alertEl.className = 'text-xs p-4 border border-red-800 bg-red-950/30 text-red-300 leading-relaxed';
-                    alertEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i>' +
-                        'We couldn\'t save your booking — please check your connection and try again, or call us on ' +
-                        '<a href="tel:07386032631" class="underline text-white">07386 032631</a>.';
-                    alertEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    showFormMessage(
+                        (e && e.name === 'AbortError'
+                            ? 'This is taking longer than usual. Your booking may still go through — please wait a minute before trying again, or call us on '
+                            : 'We couldn\'t save your booking — please check your connection and try again, or call us on ') +
+                        '<a href="tel:07386032631">07386 032631</a>.', 'error');
                     return;
                 }
 
@@ -2549,10 +2585,10 @@
             </p>
         </div>
         <div style="display:flex;gap:10px;flex-shrink:0;">
-            <button onclick="acceptCookies()" style="background:#3B82F6;color:#fff;border:none;padding:10px 22px;font-size:12px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;">
+            <button type="button" id="cookie-accept" onclick="acceptCookies()" style="background:#3B82F6;color:#fff;border:none;padding:10px 22px;font-size:12px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;">
                 Accept
             </button>
-            <button onclick="declineCookies()" style="background:transparent;color:#71717a;border:1px solid #3f3f46;padding:10px 16px;font-size:12px;font-weight:600;cursor:pointer;">
+            <button type="button" id="cookie-decline" onclick="declineCookies()" style="background:transparent;color:#71717a;border:1px solid #3f3f46;padding:10px 16px;font-size:12px;font-weight:600;cursor:pointer;">
                 Essential Only
             </button>
         </div>
@@ -2582,7 +2618,7 @@
                 This site uses essential cookies only — these are required for the booking system to prevent double-bookings (stored locally in your browser). We do not use tracking cookies, advertising cookies, or analytics.</p>
 
                 <p><strong style="color:#d4d4d8;">Data retention</strong><br>
-                Booking data stored in your browser (localStorage) is automatically cleared when you clear your browser data. We do not store your personal data on our servers.</p>
+                Your booking details are stored securely in the shop's Google account so we can manage your appointment, and are kept only as long as needed to run the business. Ask us at any time and we'll delete them.</p>
 
                 <p><strong style="color:#d4d4d8;">Your rights (UK GDPR)</strong><br>
                 You have the right to request access to, correction of, or deletion of your personal data. Contact us at sisaygrmay12@gmail.com to exercise these rights.</p>
@@ -2599,46 +2635,48 @@
     <script>
         // ══════════════════════════════════════════════════════════
         // Cookie consent
-        // The banner is position:fixed at z-index 9999, so it sits on
-        // top of whatever is at the bottom of the viewport. Without
-        // the padding below, it covered the Confirm Appointment button
-        // and swallowed the tap — the form looked broken.
+        // Everything is inside one closure — no top-level names that a
+        // browser extension or third-party embed could collide with —
+        // and the buttons are wired twice (addEventListener + onclick),
+        // so a failure in one path can never leave them dead.
         // ══════════════════════════════════════════════════════════
-        const CONSENT_KEY = 'sis_cookie_consent';
+        (function () {
+            var KEY = 'sis_cookie_consent';
+            var banner = document.getElementById('cookie-banner');
+            if (!banner) return;
 
-        function padForBanner() {
-            const b = document.getElementById('cookie-banner');
-            if (!b || b.style.display === 'none') {
-                document.body.style.paddingBottom = '';
-                return;
+            function pad() {
+                if (banner.style.display === 'none') { document.body.style.paddingBottom = ''; return; }
+                document.body.style.paddingBottom = (banner.offsetHeight + 24) + 'px';
             }
-            // Reserve the banner's height (plus a little) so every
-            // control can be scrolled clear of it.
-            document.body.style.paddingBottom = (b.offsetHeight + 24) + 'px';
-        }
 
-        function hideCookieBanner(value) {
-            try { localStorage.setItem(CONSENT_KEY, value); } catch (e) {}
-            const b = document.getElementById('cookie-banner');
-            if (b) b.style.display = 'none';
-            document.body.style.paddingBottom = '';
-        }
+            function hide(value) {
+                try { localStorage.setItem(KEY, value); } catch (e) {}
+                banner.style.setProperty('display', 'none', 'important');
+                document.body.style.paddingBottom = '';
+                window.removeEventListener('resize', pad);
+            }
 
-        function acceptCookies()  { hideCookieBanner('accepted'); }
-        function declineCookies() { hideCookieBanner('essential'); }
+            window.acceptCookies  = function () { hide('accepted');  };
+            window.declineCookies = function () { hide('essential'); };
 
-        (function() {
-            const banner = document.getElementById('cookie-banner');
-            let stored = null;
-            try { stored = localStorage.getItem(CONSENT_KEY); } catch (e) {}
+            var acc = document.getElementById('cookie-accept');
+            var dec = document.getElementById('cookie-decline');
+            if (acc) acc.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); hide('accepted'); });
+            if (dec) dec.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); hide('essential'); });
 
-            if (!stored && banner) {
+            var stored = null;
+            try { stored = localStorage.getItem(KEY); } catch (e) {}
+
+            if (stored) {
+                banner.style.setProperty('display', 'none', 'important');
+            } else {
                 banner.style.display = 'flex';
-                padForBanner();
-                window.addEventListener('resize', padForBanner);
-                // Height changes once fonts load and text reflows
-                setTimeout(padForBanner, 400);
-                setTimeout(padForBanner, 1500);
+                banner.style.pointerEvents = 'auto';
+                pad();
+                window.addEventListener('resize', pad);
+                setTimeout(pad, 400);
+                setTimeout(pad, 1500);
             }
         })();
     </script>
