@@ -1413,7 +1413,7 @@
 
                         <!-- Honeypot — hidden from humans, catches bots -->
                         <div aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden;">
-                            <input type="text" name="website" id="form-honeypot" tabindex="-1" autocomplete="off">
+                            <input type="text" name="sb_hp_field" id="form-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
                         </div>
 
                         <div class="pt-4 space-y-3">
@@ -2337,28 +2337,28 @@
                 (async () => {
 
                 // ── Security: Honeypot check (bots fill hidden fields) ────
-                const honeypot = document.getElementById('form-honeypot');
-                if (honeypot && honeypot.value.length > 0) {
-                    // Bot detected — silently fail (don't alert, don't reveal)
-                    console.warn('Honeypot triggered.');
-                    return;
-                }
+                // (Honeypot is checked server-side; a silent client-side
+                //  return here once hid real customers whose browser
+                //  autofilled the hidden field.)
 
                 // ── Security: Client-side rate limit (5 per hour per browser) ─
-                const RL_KEY    = 'sis_rl_v1';
+                // Counts SUCCESSFUL bookings only (incremented after the save
+                // below). The old version counted every click — typos and
+                // failed attempts included — then blocked with an alert()
+                // that in-app browsers suppress, so the button went dead.
+                const RL_KEY    = 'sis_rl_v2';
                 const RL_MAX    = 5;
                 const RL_WINDOW = 3600 * 1000; // 1 hour in ms
+                try { localStorage.removeItem('sis_rl_v1'); } catch (_) {}
                 try {
-                    const rlRaw  = JSON.parse(localStorage.getItem(RL_KEY) || '{"count":0,"reset":0}');
-                    const now    = Date.now();
-                    if (now > rlRaw.reset) { rlRaw.count = 0; rlRaw.reset = now + RL_WINDOW; }
-                    if (rlRaw.count >= RL_MAX) {
-                        alert('Too many booking attempts. Please wait a while before trying again, or call us on 07386 032631.');
+                    const rlRaw = JSON.parse(localStorage.getItem(RL_KEY) || '{"count":0,"reset":0}');
+                    if (Date.now() <= rlRaw.reset && rlRaw.count >= RL_MAX) {
+                        clearFormMessage();
+                        showFormMessage('You\'ve made several bookings from this device in the last hour. ' +
+                            'To book more, please call us on <a href="tel:07386032631">07386 032631</a>.', 'warn');
                         return;
                     }
-                    rlRaw.count++;
-                    localStorage.setItem(RL_KEY, JSON.stringify(rlRaw));
-                } catch {}
+                } catch (_) {}
 
                 // ── Security: Basic input sanitisation ───────────────────
                 function sanitise(str) {
@@ -2526,6 +2526,14 @@
                         '<a href="tel:07386032631">07386 032631</a>.', 'error');
                     return;
                 }
+
+                // Count this successful booking toward the per-device limit
+                try {
+                    const rl = JSON.parse(localStorage.getItem('sis_rl_v2') || '{"count":0,"reset":0}');
+                    if (Date.now() > rl.reset) { rl.count = 0; rl.reset = Date.now() + 3600 * 1000; }
+                    rl.count++;
+                    localStorage.setItem('sis_rl_v2', JSON.stringify(rl));
+                } catch (_) {}
 
                 // Saved successfully. Hand the customer to WhatsApp.
                 const waUrl = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(waMsg);
