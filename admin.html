@@ -316,7 +316,7 @@ header{border-bottom:1px solid var(--line);padding:18px 0 15px;margin-bottom:20p
 
 <script>
 // ═══════════════════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbyXey_SkQFZpFUH96DhImeVHOt_6Cm9x2iBtxiN8fNj30SmV44GLWaVW0vMUc6GkK8/exec';
+const API = 'https://script.google.com/macros/s/AKfycbyOHThvD7b7elgzLhhRL8-f8Ta2DdxJJorLVlRS5aSyReiplzsm2T2iDqRV2UWirBKV/exec';
 // ═══════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════
@@ -345,6 +345,7 @@ const STRINGS = {
     statusCancelled:'Cancelled', statusNoShow:'No-show', statusArchived:'Archived',
     statusPending:'Awaiting confirmation', confirmManually:'Confirm',
     statusReview:'Not marked', noShow:'No-show', markUp:'Mark',
+    notSeen:'Email not opened', notSeenHint:'Booking is confirmed — the customer just hasn\'t tapped the email yet',
     timedOut:'Took too long to respond. Check your internet and tap Unlock again.',
     newDay:'New day — list refreshed',
     regular:'Regular', phoneBooking:'Phone', noShowBadge:'no-show',
@@ -386,6 +387,7 @@ const STRINGS = {
     statusCancelled:'ተሰሪዙ', statusNoShow:'ኣይመጸን', statusArchived:'ተዓቚቡ',
     statusPending:'ምርግጋጽ ይጽበ', confirmManually:'ኣረጋግጽ',
     statusReview:'ኣይተመልከተን', noShow:'ኣይመጸን', markUp:'ምልክት',
+    notSeen:'ኢመይል ኣይከፈተን', notSeenHint:'ቆጸራ ተረጋጊጹ እዩ — ዓሚል ጌና ኢመይል ኣይጠወቐን',
     timedOut:'ግዜ ወሲዱ። ኢንተርነትካ ኣረጋግጽ፡ ደጊምካ ክፈት ጠውቕ።',
     newDay:'ሓዳስ መዓልቲ — ተሓዲሱ',
     regular:'ቀዋሚ', phoneBooking:'ብስልኪ', noShowBadge:'ኣይመጸን',
@@ -839,6 +841,8 @@ function render(){
         </div>
       </div>
       <div class="c-name" ${k?`onclick="openCustomer('${k}')" style="cursor:pointer"`:''}>${esc(b.name)}
+        ${b.source!=='Phone' && b.verified!=='Yes' && b.verified!=='Staff' && st!=='Done'
+          ? `<span class="src" style="color:#FBBF24;border-color:rgba(251,191,36,.5)" title="${t('notSeenHint')}">${t('notSeen')}</span>` : ''}
         ${isRegular?'<span class="src" style="color:var(--purple);border-color:var(--purple)">'+t('regular')+'</span>':''}
         ${b.source==='Phone'?'<span class="src">'+t('phoneBooking')+'</span>':''}
       </div>

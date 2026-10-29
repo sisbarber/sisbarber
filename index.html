@@ -214,6 +214,14 @@
             background: rgba(251,191,36,.07);
             padding: 18px;
         }
+        .next-step-ok {
+            border-color: rgba(52,211,153,.35);
+            border-left-color: #34D399;
+            background: rgba(52,211,153,.07);
+        }
+        .next-step-ok .next-step-label { color: #34D399; }
+        .next-step-ok .next-step-warn { border-top-color: rgba(52,211,153,.2); }
+        .next-step-ok .next-step-warn i { color: #34D399; }
         .next-step-label {
             font-size: 10px; font-weight: 800; letter-spacing: 2px;
             text-transform: uppercase; color: #FBBF24; margin-bottom: 16px;
@@ -1550,22 +1558,21 @@
     <div id="success-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition duration-300">
         <div class="bg-zinc-900 border border-zinc-800 p-8 max-w-md w-full relative shadow-2xl text-left space-y-6">
             <div class="absolute top-0 left-0 w-full h-[2px] bg-white"></div>
-            <div class="flex items-center space-x-3 text-amber-400">
-                <i class="fa-solid fa-envelope-open-text text-2xl"></i>
-                <h3 class="text-lg font-black uppercase tracking-widest text-white">One Last Step</h3>
+            <div class="flex items-center space-x-3 text-emerald-400">
+                <i class="fa-solid fa-circle-check text-2xl"></i>
+                <h3 class="text-lg font-black uppercase tracking-widest text-white">You're Booked In</h3>
             </div>
 
-            <!-- The booking is NOT live yet. Make that impossible to miss. -->
-            <div class="next-step">
-                <p class="next-step-label">Your slot is held, not confirmed</p>
+            <div class="next-step next-step-ok">
+                <p class="next-step-label">Your appointment is confirmed</p>
                 <ol class="next-step-list">
-                    <li><span>1</span> Open your email — we've just sent it to <strong id="modal-summary-email-inline" class="text-white"></strong></li>
-                    <li><span>2</span> Tap the big <strong class="text-white">“Confirm My Appointment”</strong> button inside</li>
-                    <li><span>3</span> That's it — you'll see a confirmation page</li>
+                    <li><span>1</span> We've emailed the details to <strong id="modal-summary-email-inline" class="text-white"></strong></li>
+                    <li><span>2</span> It has directions and a map — handy on the way over</li>
+                    <li><span>3</span> We'll send a reminder the evening before</li>
                 </ol>
                 <p class="next-step-warn">
-                    <i class="fa-solid fa-clock"></i>
-                    You have <strong>45 minutes</strong> before the slot is released. Can't see the email? Check your <strong>spam or junk</strong> folder.
+                    <i class="fa-solid fa-circle-info"></i>
+                    Nothing else to do. Can't see the email? Check your <strong>spam or junk</strong> folder — but your slot is secure either way.
                 </p>
             </div>
             <div class="border-y border-zinc-800 py-4 space-y-2.5 text-xs font-mono">
@@ -1673,7 +1680,7 @@
         }
 
         // Google Apps Script Web App URL — powers the /admin booking dashboard
-        const BOOKINGS_API      = 'https://script.google.com/macros/s/AKfycbyXey_SkQFZpFUH96DhImeVHOt_6Cm9x2iBtxiN8fNj30SmV44GLWaVW0vMUc6GkK8/exec';
+        const BOOKINGS_API      = 'https://script.google.com/macros/s/AKfycbyOHThvD7b7elgzLhhRL8-f8Ta2DdxJJorLVlRS5aSyReiplzsm2T2iDqRV2UWirBKV/exec';
         const SHOP_EMAIL        = 'sisaygrmay12@gmail.com';
 
         // ══════════════════════════════════════════════════════════════════
