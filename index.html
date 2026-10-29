@@ -202,6 +202,19 @@
             .barber-card:hover .barber-photo img { transform: none; }
         }
 
+        /* ── WhatsApp button in the booking summary ── */
+        .wa-cta {
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            width: 100%; padding: 18px 16px;
+            background: #25D366; color: #fff; text-decoration: none;
+            font-size: 15px; font-weight: 800; letter-spacing: .3px;
+            box-shadow: 0 6px 22px rgba(37,211,102,.35);
+            transition: transform .12s ease, background .2s ease;
+        }
+        .wa-cta i { font-size: 24px; }
+        .wa-cta:hover { background: #1ebe5b; }
+        .wa-cta:active { transform: scale(.98); }
+
         /* ── Submit feedback box — always visible, sits above the button ── */
         .form-message {
             padding: 16px 18px;
@@ -1623,6 +1636,13 @@
                 <p class="text-[10px] uppercase tracking-widest text-emerald-500 font-bold mb-1 flex items-center space-x-2"><i class="fa-solid fa-circle-info"></i><span>Need to adjust your time?</span></p>
                 <p class="text-zinc-400 text-xs font-light leading-relaxed">Call us at <a href="tel:07386032631" class="text-white font-bold hover:underline">07386 032631</a></p>
             </div>
+            <!-- A real link the customer taps. Browsers block window.open()
+                 once the save has taken a few seconds, but never block a
+                 link the user taps themselves. -->
+            <a id="modal-whatsapp-btn" href="#" target="_blank" rel="noopener" class="wa-cta">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>Send booking to Sis on WhatsApp</span>
+            </a>
             <button id="modal-close-btn" class="w-full bg-white text-black font-black uppercase tracking-widest py-3 text-xs hover:bg-zinc-200 transition duration-200">Close Window</button>
         </div>
     </div>
@@ -1776,6 +1796,16 @@
             box.className = 'form-message is-' + (tone || 'error');
             box.innerHTML = '<i class="fa-solid ' + icon + '"></i><div>' + html + '</div>';
             box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        function bookingCrashed(msg) {
+            const btn = document.getElementById('submit-btn');
+            if (btn) { btn.disabled = false; btn.textContent = 'Confirm Appointment'; }
+            const note = document.getElementById('email-sending-note');
+            if (note) note.classList.add('hidden');
+            console.error('Booking failed:', msg);
+            showFormMessage('Something went wrong on this device and your booking was not sent. ' +
+                'Please try again, or call us on <a href="tel:07386032631">07386 032631</a>.' +
+                '<br><span style="opacity:.6;font-size:12px">Error: ' + String(msg).replace(/[<>&]/g,'').slice(0,140) + '</span>', 'error');
         }
         function clearFormMessage() {
             const box = document.getElementById('form-message');
@@ -2299,8 +2329,12 @@
             const appointmentForm = document.getElementById('appointment-form');
             const successModal = document.getElementById('success-modal');
 
-            appointmentForm?.addEventListener('submit', async (e) => {
+            appointmentForm?.addEventListener('submit', (e) => {
                 e.preventDefault();
+                // Run the booking inside a guard: if ANYTHING throws on any
+                // device, the customer is told and the button is reset —
+                // the form can never again fail in silence.
+                (async () => {
 
                 // ── Security: Honeypot check (bots fill hidden fields) ────
                 const honeypot = document.getElementById('form-honeypot');
@@ -2493,8 +2527,19 @@
                     return;
                 }
 
-                // Saved successfully — only now is it safe to leave the page.
-                openWhatsApp(waMsg);
+                // Saved successfully. Hand the customer to WhatsApp.
+                const waUrl = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(waMsg);
+                const waBtn = document.getElementById('modal-whatsapp-btn');
+                if (waBtn) waBtn.href = waUrl;
+
+                // Browsers only allow a new window while the original click
+                // is still "fresh". If the save was quick enough, open it
+                // automatically; otherwise the big green button in the
+                // summary does it with one tap — never a silent failure.
+                const stillActive = navigator.userActivation && navigator.userActivation.isActive;
+                if (stillActive) {
+                    try { window.open(waUrl, '_blank', 'noopener'); } catch (_) {}
+                }
 
                 // Show success modal
                 sendNote.classList.add('hidden');
@@ -2509,6 +2554,7 @@
                 document.getElementById('modal-summary-barber').textContent = confirmedBarber.toUpperCase();
                 document.getElementById('modal-summary-datetime').textContent = `${dateLabel} @ ${time}`;
                 successModal.classList.remove('hidden');
+                })().catch(err => bookingCrashed(err && err.message ? err.message : String(err)));
             });
 
             document.getElementById('modal-close-btn')?.addEventListener('click', () => {
