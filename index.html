@@ -196,6 +196,12 @@
             font-weight: 300; margin-top: 14px;
         }
 
+        .barber-card.is-away { opacity: .55; }
+        .barber-card.is-away:hover { transform: none; border-color: #1f1f23; }
+        .barber-card.is-away:hover .barber-photo img { filter: grayscale(100%) contrast(1.05); transform: none; }
+        .barber-status.is-away { color: #a1a1aa; }
+        .barber-status.is-away .dot { background: #71717a; box-shadow: none; }
+
         @media (prefers-reduced-motion: reduce) {
             .barber-card, .barber-photo img { transition: none; }
             .barber-card:hover { transform: none; }
@@ -354,7 +360,7 @@
         /* ── Barber picker inside the booking form ── */
         .barber-pick {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 8px;
         }
         .barber-pick-card {
@@ -1168,21 +1174,21 @@
                         </div>
                     </article>
 
-                    <!-- JAY -->
-                    <article class="barber-card">
+                    <!-- JAY — currently unavailable. To restore: remove "is-away", set status back to Available -->
+                    <article class="barber-card is-away">
                         <div class="barber-photo">
                             <picture>
                                 <source srcset="assets/images/barbers/jay.webp" type="image/webp">
                                 <img src="assets/images/barbers/jay.jpg" alt="Jay, barber at Sis Barber Shop in Walsall"
                                      width="900" height="1125" loading="lazy" decoding="async">
                             </picture>
-                            <span class="barber-badge">Barber</span>
+                            <span class="barber-badge">Away</span>
                         </div>
                         <div class="barber-meta">
                             <h3>Jay</h3>
                             <p class="barber-role">Barber</p>
-                            <p class="barber-status"><span class="dot"></span>Available</p>
-                            <p class="barber-bio">Fades, tapers and precision line-ups.</p>
+                            <p class="barber-status is-away"><span class="dot"></span>Currently unavailable</p>
+                            <p class="barber-bio">Not taking bookings at the moment. Book with Sis or Teddy.</p>
                         </div>
                     </article>
 
@@ -1358,16 +1364,6 @@
                                                 <img src="assets/images/barbers/teddy.jpg" alt="" width="900" height="1125" loading="lazy" decoding="async">
                                             </picture>
                                             <p class="barber-pick-name">Teddy</p>
-                                            <p class="barber-pick-status">● Available</p>
-                                        </div>
-                                    </label>
-                                    <label class="cursor-pointer group"><input type="radio" name="barber" value="Jay" class="peer sr-only" onchange="onBarberRadioChange()">
-                                        <div class="barber-pick-card">
-                                            <picture>
-                                                <source srcset="assets/images/barbers/jay.webp" type="image/webp">
-                                                <img src="assets/images/barbers/jay.jpg" alt="" width="900" height="1125" loading="lazy" decoding="async">
-                                            </picture>
-                                            <p class="barber-pick-name">Jay</p>
                                             <p class="barber-pick-status">● Available</p>
                                         </div>
                                     </label>
@@ -1822,7 +1818,7 @@
             return true;
         }
 
-        const BARBERS = ['Sis', 'Teddy', 'Jay'];
+        const BARBERS = ['Sis', 'Teddy'];   // Jay: currently unavailable
 
         // Off days per barber: 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
         const BARBER_OFF_DAYS = {
@@ -2157,7 +2153,7 @@
             { q: ['wash','washing','machine','hair wash'],
               a: 'Yes! We have a professional washing station with a full washing machine. You can add a hair wash to any service, or book the Full Service which includes everything. 🫧' },
             { q: ['barber','team','staff','who','sis','teddy'],
-              a: 'Our team:\n\n👑 Sis — Owner & Lead Barber\n✂️ Teddy — Senior Stylist\n✂️ Jay — Barber\n\nAll three available. You can pick your barber when booking.' },
+              a: 'Our team:\n\n👑 Sis — Owner & Lead Barber\n✂️ Teddy — Senior Stylist\n\nBoth available now. You can pick your barber when booking.' },
             { q: ['walk in','walk-in','walkin','no appointment'],
               a: 'Walk-ins are welcome! Just come in and we\'ll fit you in. To guarantee your slot though, booking online is quicker.' },
             { q: ['how long','duration','time'],
